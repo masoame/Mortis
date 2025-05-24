@@ -5,27 +5,27 @@ namespace Mortis
 {
 	namespace PE
 	{
-		using RVA = DWORD;
+		using Rva = DWORD;
 		using Ordinal = WORD;
 		using Hint = WORD;
 		using FunctionPtr = LPVOID;
 
 		//搜索进程
-		template<typename StringType, typename _PROCESSENTRY32>
+		template<typename StringType, typename PROCESSENTRY32Wrapper>
 		auto SearchProcess(const StringType& ProcessName)
-			-> std::unique_ptr<_PROCESSENTRY32>;
+			-> std::unique_ptr<PROCESSENTRY32Wrapper>;
 
 		//搜索模块
-		template<typename StringType, typename _MODULEENTRY32>
+		template<typename StringType, typename MODULEENTRY32Wrapper>
 		auto SearchModule(DWORD th32ProcessID, const StringType& ModuleName)
-			-> std::unique_ptr<_MODULEENTRY32>;
+			-> std::unique_ptr<MODULEENTRY32Wrapper>;
 
 		//进程信息
-		template<typename T, typename _PROCESSENTRY32>
-		auto ProcessInfo() -> std::vector<_PROCESSENTRY32>;
+		template<typename T, typename PROCESSENTRY32Wrapper>
+		auto ProcessInfo() -> std::vector<PROCESSENTRY32Wrapper>;
 
 		//模块信息
-		template<typename T, typename _MODULEENTRY32>
+		template<typename T, typename MODULEENTRY32Wrapper>
 		auto ModuleInfo(DWORD th32ProcessID) -> std::vector<MODULEENTRY32>;
 
 		//获得DOS头和NT头
@@ -46,150 +46,144 @@ namespace Mortis
 		{ p.szExePath } -> ArrayElementTypeIsSame<T1>;
 		};
 
-		template<bool is_wide>
-		using _Process32First = std::conditional_t<is_wide, Functor<Process32FirstW>, Functor<Process32First>>;
-		template<bool is_wide>
-		using _Process32Next = std::conditional_t<is_wide, Functor<Process32NextW>, Functor<Process32Next>>;
-		template<bool is_wide>
-		using _Module32First = std::conditional_t<is_wide, Functor<Module32FirstW>, Functor<Module32First>>;
-		template<bool is_wide>
-		using _Module32Next = std::conditional_t<is_wide, Functor<Module32NextW>, Functor<Module32Next>>;
-		template<bool is_wide>
-		using _CMPFUNC_RAW = std::conditional_t<is_wide, Functor<wcscmp>, Functor<strcmp>>;
-		template<bool is_wide>
-		using _CMPIFUNC_RAW = std::conditional_t<is_wide, Functor<wcsicmp>, Functor<stricmp>>;
 		//--data--
 		template<bool is_wide>
 		struct API {
-			using _Process32First = _Process32First<is_wide>;
-			using _Process32Next = _Process32Next<is_wide>;
-			using _Module32First = _Module32First<is_wide>;
-			using _Module32Next = _Module32Next<is_wide>;
-			using _CMPFUNC_RAW = _CMPFUNC_RAW<is_wide>;
-			using _CMPIFUNC_RAW = _CMPIFUNC_RAW<is_wide>;
+			using Process32FirstWrapper = std::conditional_t<is_wide, Functor<Process32FirstW>, Functor<Process32First>>;
+			using Process32NextWrapper = std::conditional_t<is_wide, Functor<Process32NextW>, Functor<Process32Next>>;
+			using Module32FirstWrapper = std::conditional_t<is_wide, Functor<Module32FirstW>, Functor<Module32First>>;
+			using Module32NextWrapper = std::conditional_t<is_wide, Functor<Module32NextW>, Functor<Module32Next>>;
+			using StrCmpWrapper = std::conditional_t<is_wide, Functor<wcscmp>, Functor<strcmp>>;
+			using StrCmpIgnoreCaseWrapper = std::conditional_t<is_wide, Functor<wcsicmp>, Functor<stricmp>>;
+		};
+
+		template<bool is_wide>
+		struct DATA {
+			using PROCESSENTRY32Wrapper = std::conditional_t<is_wide, PROCESSENTRY32W, PROCESSENTRY32>;
+			using MODULEENTRY32Wrapper = std::conditional_t<is_wide, MODULEENTRY32W, MODULEENTRY32>;
 		};
 
 		template<typename T1>
-		struct SearchProcessData {
+		struct SearchProcessWrapper {
 			inline static constexpr bool is_wide = not (std::is_convertible_v<T1, std::string> || std::is_same_v<T1, std::string_view>);
 			inline static constexpr bool is_raw_ptr = not HasType<T1, std::wstring, std::string, std::string_view, std::wstring_view>;
-			using _PROCESSENTRY32 = std::conditional_t<is_wide, PROCESSENTRY32W, PROCESSENTRY32>;
+			using DATA = DATA<is_wide>;
 			using API = API<is_wide>;
 		};
 
 		template<typename T1>
-		struct SearchModuleData {
+		struct SearchModuleWrapper {
 			inline static constexpr bool is_wide = not (std::is_convertible_v<T1, std::string> || std::is_same_v<T1, std::string_view>);
 			inline static constexpr bool is_raw_ptr = not std::is_same_v<T1, std::conditional_t<is_wide, std::wstring, std::string>>;
-			using _MODULEENTRY32 = std::conditional_t<is_wide, MODULEENTRY32W, MODULEENTRY32>;
+			using DATA = DATA<is_wide>;
 			using API = API<is_wide>;
 		};
 
 		template<typename T>
 			requires HasType<T, char, wchar_t>
-		struct ProcessInfoData {
+		struct ProcessInfoWrapper {
 			inline static constexpr bool is_wide = std::is_same_v<T, wchar_t>;
-			using _PROCESSENTRY32 = std::conditional_t<is_wide, PROCESSENTRY32W, PROCESSENTRY32>;
+			using DATA = DATA<is_wide>;
 			using API = API<is_wide>;
 		};
 
 		template<typename T>
 			requires HasType<T, char, wchar_t>
-		struct ModuleInfoData {
+		struct ModuleInfoWrapper {
 			inline static constexpr bool is_wide = std::is_same_v<T, wchar_t>;
-			using _MODULEENTRY32 = std::conditional_t<is_wide, MODULEENTRY32W, MODULEENTRY32>;
+			using DATA = DATA<is_wide>;
 			using API = API<is_wide>;
 		};
 
 
-		template<typename T, typename _Static_Data = SearchProcessData<T>, typename _PROCESSENTRY32 = _Static_Data::_PROCESSENTRY32>
-			requires SearchProcessConcept<T, _PROCESSENTRY32>
-		auto SearchProcess(const T& ProcessName) -> std::unique_ptr<_PROCESSENTRY32>
+		template<typename T, typename UseWrapper = SearchProcessWrapper<T>, typename PROCESSENTRY32Wrapper = UseWrapper::DATA::PROCESSENTRY32Wrapper>
+			requires SearchProcessConcept<T, PROCESSENTRY32Wrapper>
+		auto SearchProcess(const T& ProcessName) -> std::unique_ptr<PROCESSENTRY32Wrapper>
 		{
-			auto pe32 = std::make_unique<_PROCESSENTRY32>();
+			auto pe32 = std::make_unique<PROCESSENTRY32Wrapper>();
 			pe32->dwSize = sizeof(*pe32);
 
 			AutoHandle<> hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 			if (hProcessSnap == INVALID_HANDLE_VALUE) return nullptr;
 
-			BOOL bRet = _Static_Data::API::_Process32First()(hProcessSnap, pe32.get());
+			BOOL bRet = UseWrapper::API::Process32FirstWrapper()(hProcessSnap, pe32.get());
 			while (bRet)
 			{
-				if constexpr (_Static_Data::is_raw_ptr) {
-					if (!_Static_Data::API::_CMPFUNC_RAW()(pe32->szExeFile, ProcessName))
+				if constexpr (UseWrapper::is_raw_ptr) {
+					if (!UseWrapper::API::StrCmpWrapper()(pe32->szExeFile, ProcessName))
 						return pe32;
 				}
 				else {
 					if (ProcessName == pe32->szExeFile) 
 						return pe32;
 				}
-				bRet = _Static_Data::API::_Process32Next()(hProcessSnap, pe32.get());
+				bRet = UseWrapper::API::Process32NextWrapper()(hProcessSnap, pe32.get());
 			}
 			return nullptr;
 		}
 
-		template<typename T, typename _Static_Data = SearchModuleData<T>, typename _MODULEENTRY32 = _Static_Data::_MODULEENTRY32>
-			requires SearchModuleConcept<T, _MODULEENTRY32>
-		auto SearchModule(DWORD th32ProcessID, const T& ModuleName) -> std::unique_ptr<_MODULEENTRY32>
+		template<typename T, typename UseWrapper = SearchModuleWrapper<T>, typename MODULEENTRY32Wrapper = UseWrapper::DATA::MODULEENTRY32Wrapper>
+			requires SearchModuleConcept<T, MODULEENTRY32Wrapper>
+		auto SearchModule(DWORD th32ProcessID, const T& ModuleName) -> std::unique_ptr<MODULEENTRY32Wrapper>
 		{
-			auto pe32 = std::make_unique<_MODULEENTRY32>();
+			auto pe32 = std::make_unique<MODULEENTRY32Wrapper>();
 			pe32->dwSize = sizeof(*pe32);
 
 			AutoHandle hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, th32ProcessID);
 			if (hProcessSnap == INVALID_HANDLE_VALUE) return nullptr;
 
-			BOOL bMore = _Static_Data::API::_Module32First()(hProcessSnap, pe32.get());
+			BOOL bMore = UseWrapper::API::Module32FirstWrapper()(hProcessSnap, pe32.get());
 			while (bMore)
 			{
-				if constexpr (_Static_Data::is_raw_ptr) {
-					if (!_Static_Data::API::_CMPIFUNC_RAW()(pe32->szModule, ModuleName)) 
+				if constexpr (UseWrapper::is_raw_ptr) {
+					if (!UseWrapper::API::StrCmpIgnoreCaseWrapper()(pe32->szModule, ModuleName)) 
 						return pe32;
 				}
 				else {
-					if (!_Static_Data::API::_CMPIFUNC_RAW()(pe32->szModule, ModuleName.c_str()))
+					if (!UseWrapper::API::StrCmpIgnoreCaseWrapper()(pe32->szModule, ModuleName.c_str()))
 						return pe32;
 				}
-				bMore = _Static_Data::API::_Module32Next()(hProcessSnap, pe32.get());
+				bMore = UseWrapper::API::Module32NextWrapper()(hProcessSnap, pe32.get());
 			};
 			return nullptr;
 		}
 
-		template<typename T, typename _Static_Data = ProcessInfoData<T>, typename _PROCESSENTRY32 = _Static_Data::_PROCESSENTRY32>
-		auto ProcessInfo() -> std::vector<_PROCESSENTRY32>
+		template<typename T, typename UseWrapper = ProcessInfoWrapper<T>, typename PROCESSENTRY32Wrapper = UseWrapper::DATA::PROCESSENTRY32Wrapper>
+		auto ProcessInfo() -> std::vector<PROCESSENTRY32Wrapper>
 		{
 			AutoHandle hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 			if (hProcessSnap == INVALID_HANDLE_VALUE) return {};
 
-			_PROCESSENTRY32 pe32{};
+			PROCESSENTRY32Wrapper pe32{};
 			pe32.dwSize = sizeof(pe32);
 
-			std::vector<_PROCESSENTRY32> ret{};
+			std::vector<PROCESSENTRY32Wrapper> ret{};
 
-			BOOL bMore = _Static_Data::API::_Process32First()(hProcessSnap, &pe32);
+			BOOL bMore = UseWrapper::API::Process32FirstWrapper()(hProcessSnap, &pe32);
 			while (bMore)
 			{
 				ret.emplace_back(pe32);
-				bMore = _Static_Data::API::_Process32Next()(hProcessSnap, &pe32);
+				bMore = UseWrapper::API::Process32NextWrapper()(hProcessSnap, &pe32);
 			};
 			return ret;
 		}
 
-		template<typename T, typename _Static_Data = ModuleInfoData<T>, typename _MODULEENTRY32 = _Static_Data::_MODULEENTRY32>
-		auto ModuleInfo(DWORD th32ProcessID) -> std::vector<_MODULEENTRY32>
+		template<typename T, typename UseWrapper = ModuleInfoWrapper<T>, typename MODULEENTRY32Wrapper = UseWrapper::MODULEENTRY32Wrapper>
+		auto ModuleInfo(DWORD th32ProcessID) -> std::vector<MODULEENTRY32Wrapper>
 		{
 			AutoHandle hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, th32ProcessID);
 			if (hProcessSnap == INVALID_HANDLE_VALUE) return {};
 
-			std::vector<_MODULEENTRY32> ret{};
+			std::vector<MODULEENTRY32Wrapper> ret{};
 
-			_MODULEENTRY32 pe32{};
+			MODULEENTRY32Wrapper pe32{};
 			pe32.dwSize = sizeof(pe32);
 
-			BOOL bMore = _Static_Data::API::_Module32First()(hProcessSnap, &pe32);
+			BOOL bMore = UseWrapper::API::Module32FirstWrapper()(hProcessSnap, &pe32);
 			while (bMore)
 			{
 				ret.emplace_back(pe32);
-				bMore = _Static_Data::API::_Module32Next()(hProcessSnap, &pe32);
+				bMore = UseWrapper::API::Module32NextWrapper()(hProcessSnap, &pe32);
 			};
 			return ret;
 		}

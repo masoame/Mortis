@@ -20,12 +20,12 @@ namespace Mortis::PE::Exp
 	}
 
 	auto GetNameOfRVAGroup(HANDLE ProcessHandle, HMODULE BaseAddress, const std::unique_ptr<IMAGE_EXPORT_DIRECTORY>& ExpDir)
-		-> std::vector<RVA>
+		-> std::vector<Rva>
 	{
 		if (ExpDir == nullptr)
 			return {};
 
-		std::vector<RVA> Namestable;
+		std::vector<Rva> Namestable;
 		Namestable.resize(ExpDir->NumberOfNames);
 
 		if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ExpDir->AddressOfNames), &Namestable[0], ExpDir->NumberOfNames * sizeof(int32_t), 0) == false)
@@ -35,7 +35,7 @@ namespace Mortis::PE::Exp
 	}
 
 	auto GetTable(HANDLE ProcessHandle, HMODULE BaseAddress)
-		-> std::vector<std::tuple<Ordinal, RVA, std::string>>
+		-> std::vector<std::tuple<Ordinal, Rva, std::string>>
 	{
 		auto ExpDir = GetDirectory(ProcessHandle, BaseAddress);
 		if (ExpDir == nullptr)
@@ -45,10 +45,10 @@ namespace Mortis::PE::Exp
 		if (Namestable.empty())
 			return {};
 
-		std::vector<std::tuple<Ordinal, RVA, std::string>> ExportTable{ ExpDir->NumberOfNames ,{} };
+		std::vector<std::tuple<Ordinal, Rva, std::string>> ExportTable{ ExpDir->NumberOfNames ,{} };
 
 		std::array<char, 256> ProcName;
-		RVA Prc_RVA = 0;
+		Rva Prc_RVA = 0;
 		Ordinal ordinals = 0;
 
 		for (DWORD i = 0; i != ExpDir->NumberOfNames; i++) {

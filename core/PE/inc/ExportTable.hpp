@@ -11,11 +11,11 @@ namespace Mortis::PE::Exp
 
 	//获得导出函数名称
 	auto GetNameOfRVAGroup(HANDLE ProcessHandle, HMODULE BaseAddress, const std::unique_ptr<IMAGE_EXPORT_DIRECTORY>& ExpDir = nullptr)
-		-> std::vector<RVA>;
+		-> std::vector<Rva>;
 
 	//获得导入表
 	auto GetTable(HANDLE ProcessHandle, HMODULE BaseAddress)
-		-> std::vector<std::tuple<Ordinal, RVA, std::string>>;
+		-> std::vector<std::tuple<Ordinal, Rva, std::string>>;
 
 	//显示导出表
 	auto ShowTable(HANDLE ProcessHandle, HMODULE BaseAddress)
