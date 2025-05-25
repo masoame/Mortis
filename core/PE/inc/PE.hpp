@@ -108,12 +108,14 @@ namespace Mortis
 			BOOL bRet = UseWrapper::API::Process32FirstWrapper()(hProcessSnap, pe32.get());
 			while (bRet){
 				if constexpr (UseWrapper::is_raw_ptr) {
-					if (!UseWrapper::API::StrCmpWrapper()(pe32->szExeFile, ProcessName))
+					if (!UseWrapper::API::StrCmpWrapper()(pe32->szExeFile, ProcessName)) {
 						return pe32;
+					}
 				}
 				else {
-					if (ProcessName == pe32->szExeFile) 
+					if (ProcessName == pe32->szExeFile) {
 						return pe32;
+					}
 				}
 				bRet = UseWrapper::API::Process32NextWrapper()(hProcessSnap, pe32.get());
 			}
@@ -155,15 +157,15 @@ namespace Mortis
 			PROCESSENTRY32Wrapper pe32{};
 			pe32.dwSize = sizeof(pe32);
 
-			std::vector<PROCESSENTRY32Wrapper> ret{};
+			std::vector<PROCESSENTRY32Wrapper> info{};
 
 			BOOL bMore = UseWrapper::API::Process32FirstWrapper()(hProcessSnap, &pe32);
 			while (bMore)
 			{
-				ret.emplace_back(pe32);
+				info.emplace_back(pe32);
 				bMore = UseWrapper::API::Process32NextWrapper()(hProcessSnap, &pe32);
 			};
-			return ret;
+			return info;
 		}
 
 		template<typename T, typename UseWrapper = ModuleInfoWrapper<T>, typename MODULEENTRY32Wrapper = UseWrapper::MODULEENTRY32Wrapper>

@@ -49,18 +49,18 @@ namespace DllHook
 
 		struct
 		{
-			HOOKWORD __dr6;
-			operator HOOKWORD () const { return __dr6; }
-			operator HOOKWORD& () { return __dr6; }
-			void operator=(const HOOKWORD& dr6) { __dr6 = dr6; }
+			HOOKWORD _dr6;
+			operator HOOKWORD () const { return _dr6; }
+			operator HOOKWORD& () { return _dr6; }
+			void operator=(const HOOKWORD& dr6) { _dr6 = dr6; }
 		}_dr6;
 
 		struct
 		{
-			HOOKWORD __dr7;
-			operator HOOKWORD () const { return __dr7; }
-			operator HOOKWORD& () { return __dr7; }
-			void operator=(const HOOKWORD& dr7) { __dr7 = dr7; }
+			HOOKWORD _dr7;
+			operator HOOKWORD () const { return _dr7; }
+			operator HOOKWORD& () { return _dr7; }
+			void operator=(const HOOKWORD& dr7) { _dr7 = dr7; }
 		}_dr7;
 
 		operator CONTEXT() const {
