@@ -16,6 +16,7 @@
 #include<type_traits>
 #include<mutex>
 #include<thread>
+#include<queue>
 
 namespace Mortis
 {
