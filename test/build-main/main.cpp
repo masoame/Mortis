@@ -7,7 +7,7 @@ using namespace Mortis::PE;
 using namespace Mortis::Hook;
 int main()
 {
-	auto process = SearchProcess(L"Notepad.exe");
+	auto process = SearchProcess(L"notepad.exe");
 	if (process == nullptr) {
 		std::cout << "Process not found" << std::endl;
 		return -1;

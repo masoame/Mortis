@@ -6,15 +6,40 @@ namespace Mortis::Pipe
 
 	struct CtrlContext
 	{
-		size_t len;
+		size_t _len;
 		std::unique_ptr<char[]> buf;
-		CtrlContext(size_t ilen, std::unique_ptr<char[]>&& ibuf)noexcept :len(ilen), buf(ibuf.release()) {};
-		CtrlContext(CtrlContext&& cf)noexcept :len(cf.len), buf(cf.buf.release()) {};
-		void operator=(CtrlContext&& cf)noexcept { len = cf.len; buf = std::move(cf.buf); };
+		CtrlContext(size_t ilen, std::unique_ptr<char[]>&& ibuf)noexcept :_len(ilen), buf(ibuf.release()) {};
+		CtrlContext(CtrlContext&& cf)noexcept :_len(cf._len), buf(cf.buf.release()) {};
+		void operator=(CtrlContext&& cf)noexcept { _len = cf._len; buf = std::move(cf.buf); };
 	};
+
+	class PipeContext {
+		PipeContext(PipeContext&) = delete;
+		PipeContext(PipeContext&& ) = delete;
+		PipeContext& operator = (PipeContext&) = delete;
+		PipeContext& operator = (PipeContext&&) = delete;
+	protected:
+		static AutoHandle<> LogPipeH;
+		static AutoHandle<> CtrlPipeH;
+		PipeContext() {
+
+		}
+		~PipeContext() {
+
+		}
+	public:
+		static PipeContext& PipeInstance() {
+			static PipeContext instance;
+			return instance;
+		}
+	};
+
+
+
+
 	struct PipeIO
 	{
-		static std::thread PipeInit;
+		static std::thread pipeInit;
 
 		static std::queue<std::string> OutQueue;
 		static std::queue<CtrlContext> InQueue;
@@ -27,8 +52,8 @@ namespace Mortis::Pipe
 		inline const PipeIO& operator<<(auto&& str)const {
 
 			ss << std::forward<decltype(str)>(str);
-			std::unique_lock lockqueue(OutQueuemtx, std::try_to_lock);
-			std::unique_lock lockss(ssmtx, std::try_to_lock);
+			std::unique_lock lockqueue(OutQueuemtx);
+			std::unique_lock lockss(ssmtx);
 			OutQueue.emplace(ss.str());
 			ss.str("");
 			ss.clear();
@@ -36,7 +61,7 @@ namespace Mortis::Pipe
 
 		}
 
-		inline const PipeIO& operator>>(CtrlContext& cf)const;
+		inline const PipeIO& operator>>(CtrlContext& cf) const;
 	private:
 		static std::stringstream ss;
 		static std::mutex ssmtx;
