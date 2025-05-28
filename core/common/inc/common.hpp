@@ -17,11 +17,12 @@
 #include<mutex>
 #include<thread>
 #include<queue>
+#include<chrono>
 
 namespace Mortis
 {
-	template <auto _F>
-	using Functor = std::integral_constant<std::remove_reference_t<decltype(_F)>, _F>;
+	template <auto F>
+	using Functor = std::integral_constant<std::remove_reference_t<decltype(F)>, F>;
 
 	namespace BaseConcept 
 	{
@@ -39,7 +40,6 @@ namespace Mortis
 		concept ArrayElementTypeIsSame = requires(T1 t1, T2 t2) {
 			requires std::same_as<std::remove_const_t<std::remove_reference_t<decltype(t1[0])>>, std::remove_const_t<std::remove_reference_t<decltype(t2[0])>>>;
 		};
-
 	};
 
 	template<auto is_wide>
@@ -54,6 +54,23 @@ namespace Mortis
 
 	};
 
+	template<typename PurgeFunc,typename... Args>
+		requires requires(PurgeFunc f, Args...args) { std::invoke(f, args...); }
+	struct ScopeExecutor
+	{
+		PurgeFunc _func;
+		std::tuple<Args...> _args;
+	public:
+		ScopeExecutor(ScopeExecutor&) = delete;
+		ScopeExecutor(PurgeFunc&& func, Args&& ...args) : _func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<std::tuple<Args>>(args)... }
+		{}
+
+		~ScopeExecutor() {
+			std::apply(_func, _args);
+		}
+	};
+	template<typename PurgeFunc, typename...Args>
+	ScopeExecutor(PurgeFunc&&, Args&&...) -> ScopeExecutor<std::decay_t<PurgeFunc>, std::decay_t<Args>...>;
 
 	template<class _T = void, class _FreeFunc = Functor<CloseHandle>>
 	struct AutoHandle
@@ -90,11 +107,105 @@ namespace Mortis
 		using DeletePtr = std::conditional<isSecPtr, DeleteSecPtr, DeletePrimaryPtr>::type;
 		std::unique_ptr<_Type, DeletePtr> _ptr;
 	};
+
+	/*
+	* BoundedQueue用于实现一个有界队列，支持线程安全的入队和出队操作。
+	*/
+	template<class T>
+	class bounded_queue
+	{
+		using Type = std::remove_reference_t<T>;
+	public:
+		bounded_queue(std::size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
+
+		~bounded_queue() {
+			_is_closed = true;
+			_cv_could_push.notify_all();
+			_cv_could_pop.notify_all();
+		}
+
+		template<typename... Args>
+		void emplace(Args&&... args) noexcept
+		{
+			std::unique_lock lock(_mtx);
+			_cv_could_push.wait(lock, [this] { return (_queue.size() < this->_max_size) || _is_closed; });
+			if (_is_closed) return;
+			_queue.emplace_back(std::forward<Args>(args)...);
+			_cv_could_pop.notify_one();
+			return;
+		}
+
+		void push(Type&& value) noexcept
+		{
+			std::unique_lock lock(_mtx);
+			_cv_could_push.wait(lock, [this] { return (_queue.size() < this->_max_size) || _is_closed; });
+			if (_is_closed) return;
+			_queue.push_back(std::move(value));
+			_cv_could_pop.notify_one();
+		}
+
+		void push(const Type& value) noexcept
+		{
+			std::unique_lock lock(_mtx);
+			_cv_could_push.wait(lock, [this] { return (_queue.size() < this->_max_size) || _is_closed; });
+			if (_is_closed) return;
+			_queue.push_back(value);
+			_cv_could_pop.notify_one();
+		}
+
+		std::optional<Type> pop() noexcept
+		{
+			std::unique_lock lock(_mtx);
+			_cv_could_pop.wait(lock, [this] { return (this->_queue.empty() == false) || _is_closed; });
+			if (_is_closed) return std::nullopt;
+			Type _ret{ std::move(_queue.front()) };
+			_queue.pop_front();
+			_cv_could_push.notify_one();
+			return _ret;
+		}
+
+		template <class _Rep, class _Period>
+		std::optional<Type> pop_for(const std::chrono::duration<_Rep, _Period>& _Rel_time) noexcept
+		{
+			std::unique_lock lock(_mtx);
+			bool cv_status = _cv_could_pop.wait_for(lock, _Rel_time, [this] { return (this->_queue.empty() == false) || _is_closed; });
+			if (_is_closed || !cv_status) {
+				return std::nullopt;
+			}
+			Type _ret{ std::move(_queue.front()) };
+			_queue.pop_front();
+			_cv_could_push.notify_one();
+			return _ret;
+		}
+
+		inline size_t size() const noexcept
+		{
+			return _queue.size();
+		}
+
+		inline bool empty() const noexcept
+		{
+			return _queue.empty();
+		}
+
+		inline bool full() const noexcept
+		{
+			return _queue.size() >= _max_size;
+		}
+
+		void clear() noexcept
+		{
+			std::unique_lock lock(_mtx);
+			_queue.clear();
+		}
+	private:
+		bool _is_closed = true;
+		std::condition_variable _cv_could_push, _cv_could_pop;
+		std::deque<Type> _queue;
+		const size_t _max_size;
+		std::mutex _mtx;
+	};
 }
-
-
-
-
 
 namespace os
 {
@@ -104,7 +215,6 @@ namespace os
 		if (GetModuleFileNameW(module, buffer.data(), MAX_PATH)) return buffer;
 		return {};
 	}
+
+
 }
-
-
-

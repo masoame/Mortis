@@ -13,23 +13,27 @@ namespace Mortis::Pipe
 		void operator=(CtrlContext&& cf)noexcept { _len = cf._len; buf = std::move(cf.buf); };
 	};
 
-	class PipeContext {
-		PipeContext(PipeContext&) = delete;
-		PipeContext(PipeContext&& ) = delete;
-		PipeContext& operator = (PipeContext&) = delete;
-		PipeContext& operator = (PipeContext&&) = delete;
+	class PipeExecutor {
+		PipeExecutor(PipeExecutor&) = delete;
+		PipeExecutor(PipeExecutor&& ) = delete;
+		PipeExecutor& operator = (PipeExecutor&) = delete;
+		PipeExecutor& operator = (PipeExecutor&&) = delete;
 	protected:
-		static AutoHandle<> LogPipeH;
-		static AutoHandle<> CtrlPipeH;
-		PipeContext() {
+		AutoHandle<> _recvPipeH;
+		AutoHandle<> _sendPipeH;
 
-		}
-		~PipeContext() {
+		bounded_queue<std::vector<char>> _recvQueue;
+		bounded_queue<std::vector<char>> _sendQueue;
+
+		std::jthread _recvThr;
+		std::jthread _sendThr;
+		PipeExecutor();
+		~PipeExecutor() {
 
 		}
 	public:
-		static PipeContext& PipeInstance() {
-			static PipeContext instance;
+		static PipeExecutor& Instance() {
+			static PipeExecutor instance;
 			return instance;
 		}
 	};
@@ -37,35 +41,35 @@ namespace Mortis::Pipe
 
 
 
-	struct PipeIO
-	{
-		static std::thread pipeInit;
+	//struct PipeIO
+	//{
+	//	static std::thread pipeInit;
 
-		static std::queue<std::string> OutQueue;
-		static std::queue<CtrlContext> InQueue;
-		static std::mutex OutQueuemtx;
-		static std::mutex InQueuemtx;
+	//	static std::queue<std::string> OutQueue;
+	//	static std::queue<CtrlContext> InQueue;
+	//	static std::mutex OutQueuemtx;
+	//	static std::mutex InQueuemtx;
 
-		static AutoHandle<> LogPipeH;
-		static AutoHandle<> CtrlPipeH;
+	//	static AutoHandle<> LogPipeH;
+	//	static AutoHandle<> CtrlPipeH;
 
-		inline const PipeIO& operator<<(auto&& str)const {
+	//	inline const PipeIO& operator<<(auto&& str)const {
 
-			ss << std::forward<decltype(str)>(str);
-			std::unique_lock lockqueue(OutQueuemtx);
-			std::unique_lock lockss(ssmtx);
-			OutQueue.emplace(ss.str());
-			ss.str("");
-			ss.clear();
-			return *this;
+	//		ss << std::forward<decltype(str)>(str);
+	//		std::unique_lock lockqueue(OutQueuemtx);
+	//		std::unique_lock lockss(ssmtx);
+	//		OutQueue.emplace(ss.str());
+	//		ss.str("");
+	//		ss.clear();
+	//		return *this;
 
-		}
+	//	}
 
-		inline const PipeIO& operator>>(CtrlContext& cf) const;
-	private:
-		static std::stringstream ss;
-		static std::mutex ssmtx;
-	};
-	extern const PipeIO pout, pin, io;
-	extern const std::string pendl;
+	//	inline const PipeIO& operator>>(CtrlContext& cf) const;
+	//private:
+	//	static std::stringstream ss;
+	//	static std::mutex ssmtx;
+	//};
+	//extern const PipeIO pout, pin, io;
+	//extern const std::string pendl;
 }
