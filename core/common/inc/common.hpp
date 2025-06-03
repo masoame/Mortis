@@ -17,11 +17,12 @@
 #include<mutex>
 #include<thread>
 #include<queue>
+#include<chrono>
 
 namespace Mortis
 {
-	template <auto _F>
-	using Functor = std::integral_constant<std::remove_reference_t<decltype(_F)>, _F>;
+	template <auto F>
+	using Functor = std::integral_constant<std::remove_reference_t<decltype(F)>, F>;
 
 	namespace BaseConcept 
 	{
@@ -39,7 +40,6 @@ namespace Mortis
 		concept ArrayElementTypeIsSame = requires(T1 t1, T2 t2) {
 			requires std::same_as<std::remove_const_t<std::remove_reference_t<decltype(t1[0])>>, std::remove_const_t<std::remove_reference_t<decltype(t2[0])>>>;
 		};
-
 	};
 
 	template<auto is_wide>
@@ -55,6 +55,23 @@ namespace Mortis
 
 	};
 
+	template<typename PurgeFunc,typename... Args>
+		requires requires(PurgeFunc f, Args...args) { std::invoke(f, args...); }
+	struct ScopeExecutor
+	{
+		PurgeFunc _func;
+		std::tuple<Args...> _args;
+	public:
+		ScopeExecutor(ScopeExecutor&) = delete;
+		ScopeExecutor(PurgeFunc&& func, Args&& ...args) : _func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<std::tuple<Args>>(args)... }
+		{}
+
+		~ScopeExecutor() {
+			std::apply(_func, _args);
+		}
+	};
+	template<typename PurgeFunc, typename...Args>
+	ScopeExecutor(PurgeFunc&&, Args&&...) -> ScopeExecutor<std::decay_t<PurgeFunc>, std::decay_t<Args>...>;
 
 	template<class _T = void, class _FreeFunc = Functor<CloseHandle>>
 	struct AutoHandle
@@ -92,16 +109,14 @@ namespace Mortis
 		std::unique_ptr<_Type, DeletePtr> _ptr;
 	};
 
-
-	template<class _T>
+	/*
+	* BoundedQueue用于实现一个有界队列，支持线程安全的入队和出队操作。
+	*/
+	template<class T>
 	class bounded_queue
 	{
-		using Type = std::remove_reference_t<_T>;
+		using Type = std::remove_reference_t<T>;
 	public:
-
-		bounded_queue(bounded_queue&) = default;
-		bounded_queue(bounded_queue&&) = default;
-
 		bounded_queue(std::size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
 
 		~bounded_queue() {
@@ -155,7 +170,9 @@ namespace Mortis
 		{
 			std::unique_lock lock(_mtx);
 			bool cv_status = _cv_could_pop.wait_for(lock, _Rel_time, [this] { return (this->_queue.empty() == false) || _is_closed; });
-			if (_is_closed || !cv_status) return std::nullopt;
+			if (_is_closed || !cv_status) {
+				return std::nullopt;
+			}
 			Type _ret{ std::move(_queue.front()) };
 			_queue.pop_front();
 			_cv_could_push.notify_one();
@@ -186,7 +203,7 @@ namespace Mortis
 		bool _is_closed = true;
 		std::condition_variable _cv_could_push, _cv_could_pop;
 		std::deque<Type> _queue;
-		const std::size_t _max_size;
+		const size_t _max_size;
 		std::mutex _mtx;
 	};
 }
@@ -199,7 +216,6 @@ namespace os
 		if (GetModuleFileNameW(module, buffer.data(), MAX_PATH)) return buffer;
 		return {};
 	}
+
+
 }
-
-
-

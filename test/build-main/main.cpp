@@ -3,10 +3,20 @@
 #include "Hook.hpp"
 #include<string>
 
+using namespace Mortis;
 using namespace Mortis::PE;
 using namespace Mortis::Hook;
 int main()
 {
+	int x = 10;
+	{
+		ScopeExecutor scope{ [](int& x)->void {
+			std::cout << "ScopeExecutor destructor called"  <<  std::endl;
+			std::cout << "x = " << x << std::endl;
+		},std::ref(x) };
+	}
+	std::cout << x << std::endl;
+
 	auto process = SearchProcess(L"notepad.exe");
 	if (process == nullptr) {
 		std::cout << "Process not found" << std::endl;

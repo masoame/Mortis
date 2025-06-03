@@ -13,34 +13,63 @@ namespace Mortis::Pipe
 		void operator=(CtrlContext&& cf)noexcept { _len = cf._len; buf = std::move(cf.buf); };
 	};
 
-	struct PIPE_OVERLAPPED : public OVERLAPPED
-	{
-
-	};
-
 	class PipeExecutor {
-	protected:
 		PipeExecutor(PipeExecutor&) = delete;
 		PipeExecutor(PipeExecutor&& ) = delete;
 		PipeExecutor& operator = (PipeExecutor&) = delete;
 		PipeExecutor& operator = (PipeExecutor&&) = delete;
+	protected:
+		AutoHandle<> _recvPipeH;
+		AutoHandle<> _sendPipeH;
 
-		static bounded_queue<std::vector<char>> recvQueue;
-		static bounded_queue<std::vector<char>> sendQueue;
+		bounded_queue<std::vector<char>> _recvQueue;
+		bounded_queue<std::vector<char>> _sendQueue;
 
-		static AutoHandle<> recvPipeHandle;
-		static AutoHandle<> sendPipeHandle;
-
-		static std::jthread recvPipeThr;
-		static std::jthread sendPipeThr;
-
+		std::jthread _recvThr;
+		std::jthread _sendThr;
 		PipeExecutor();
-		~PipeExecutor();
+		~PipeExecutor() {
+
+		}
 	public:
-		static PipeExecutor& PipeInstance() {
+		static PipeExecutor& Instance() {
 			static PipeExecutor instance;
 			return instance;
 		}
 	};
 
+
+
+
+	//struct PipeIO
+	//{
+	//	static std::thread pipeInit;
+
+	//	static std::queue<std::string> OutQueue;
+	//	static std::queue<CtrlContext> InQueue;
+	//	static std::mutex OutQueuemtx;
+	//	static std::mutex InQueuemtx;
+
+	//	static AutoHandle<> LogPipeH;
+	//	static AutoHandle<> CtrlPipeH;
+
+	//	inline const PipeIO& operator<<(auto&& str)const {
+
+	//		ss << std::forward<decltype(str)>(str);
+	//		std::unique_lock lockqueue(OutQueuemtx);
+	//		std::unique_lock lockss(ssmtx);
+	//		OutQueue.emplace(ss.str());
+	//		ss.str("");
+	//		ss.clear();
+	//		return *this;
+
+	//	}
+
+	//	inline const PipeIO& operator>>(CtrlContext& cf) const;
+	//private:
+	//	static std::stringstream ss;
+	//	static std::mutex ssmtx;
+	//};
+	//extern const PipeIO pout, pin, io;
+	//extern const std::string pendl;
 }
