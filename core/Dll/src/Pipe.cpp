@@ -34,6 +34,9 @@ namespace Mortis::Pipe
 					}
 				}
 			}
+					}
+				}
+			}
 		});
 
 		_recvThr = std::jthread([this](std::stop_token st)
@@ -46,6 +49,9 @@ namespace Mortis::Pipe
 					DisconnectNamedPipe(_recvPipeH);
 					std::cout << "LogPipe Client Disconnect" << std::endl;
 					continue;
+				}
+
+			}
 				}
 			}
 		});
