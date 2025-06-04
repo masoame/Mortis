@@ -11,12 +11,11 @@ int main()
 
 	int x = 10;
 	{
-		ScopeExecutor scope{ [](int y,int& x)->void {
+		ScopeExecutor scope{ [](int& x,double y)->void {
 			std::cout << "ScopeExecutor destructor called"  <<  std::endl;
 			std::cout << "x = " << x << std::endl;
-			x = y;
-			std::cout << "x = " << x << std::endl;
-		},std::move(x) ,std::ref(x) };
+			std::cout << "y = " << y << std::endl;
+		},std::ref(x), 3.14 };
 	}
 	std::cout << x << std::endl;
 
