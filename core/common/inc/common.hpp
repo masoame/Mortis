@@ -63,7 +63,7 @@ namespace Mortis
 		std::tuple<Args...> _args;
 
 		ScopeExecutor(ScopeExecutor&) = delete;
-		ScopeExecutor(PurgeFunc&& func, Args&& ...args) : _func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<std::tuple<Args>>(args)... }
+		ScopeExecutor(PurgeFunc&& func, Args&& ...args) : _func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<Args>(args)... }
 		{}
 
 		~ScopeExecutor() {

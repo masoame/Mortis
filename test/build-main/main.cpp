@@ -11,13 +11,13 @@ int main()
 
 	int x = 10;
 	{
-		ScopeExecutor scope{ [](int& x,double y)->void {
-			std::cout << "ScopeExecutor destructor called"  <<  std::endl;
-			std::cout << "x = " << x << std::endl;
+		ScopeExecutor scope{ [](int& x,int y)->void {
+			std::cout << "ScopeExecutor destructor called" << std::endl;
+			std::cout << "x = " << x-- << std::endl;
 			std::cout << "y = " << y << std::endl;
-		},std::ref(x), 3.14 };
+		},std::ref(x), 6 };
 	}
-	std::cout << x << std::endl;
+	std::cout << "x = " << x-- << std::endl;
 
 	auto process = SearchProcess(L"notepad.exe");
 	if (process == nullptr) {
