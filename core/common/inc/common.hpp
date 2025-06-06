@@ -73,6 +73,9 @@ namespace Mortis
 	template<typename PurgeFunc, typename...Args>
 	ScopeExecutor(PurgeFunc&&, Args&&...) -> ScopeExecutor<std::decay_t<PurgeFunc>, std::decay_t<Args>...>;
 
+
+
+
 	template<class _T = void, class _FreeFunc = Functor<CloseHandle>>
 	struct AutoHandle
 	{

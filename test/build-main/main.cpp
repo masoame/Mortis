@@ -15,7 +15,7 @@ int main()
 			std::cout << "ScopeExecutor destructor called" << std::endl;
 			std::cout << "x = " << x-- << std::endl;
 			std::cout << "y = " << y << std::endl;
-		},std::ref(x), 6 };
+		},std::ref(x), std::move(x) };
 	}
 	std::cout << "x = " << x-- << std::endl;
 
