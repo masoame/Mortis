@@ -17,7 +17,7 @@ namespace Mortis::Hook {
 	DWORD InjectDll(DWORD th32ProcessID, const wchar_t* dll)
 	{
 		//通过相应进程id打开对应进程
-		AutoHandle<> ph = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, th32ProcessID);
+		ScopeHandle<> ph = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, th32ProcessID);
 		if (ph) {
 			std::cout << "成功打开对应进程" << std::endl;
 		}else {
@@ -37,7 +37,7 @@ namespace Mortis::Hook {
 		else return (DWORD)-1;
 
 		//注入线程
-		AutoHandle<> target_thread = ::CreateRemoteThread(ph, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryW, ptrmem, 0, 0);
+		ScopeHandle<> target_thread = ::CreateRemoteThread(ph, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryW, ptrmem, 0, 0);
 		if (target_thread == false)return (DWORD)-1;
 
 		temp = ::WaitForSingleObject(target_thread, INFINITE);
@@ -98,7 +98,7 @@ namespace Mortis::Hook {
 				if (WriteProcessMemory(hProcess, lpfc, &code, sizeof(BYTE), 0) == FALSE)
 					return false;
 
-				AutoHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
+				ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
 				CONTEXT ctx{};
 				ctx.ContextFlags = CONTEXT_CONTROL;
 				if (GetThreadContext(dbg_thr, &ctx) == FALSE)

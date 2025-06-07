@@ -6,20 +6,32 @@
 using namespace Mortis;
 using namespace Mortis::PE;
 using namespace Mortis::Hook;
+
+struct A {
+	int _a;
+	int _b;
+	A() {};
+	~A() {
+		std::cout << _a << std::endl;
+		std::cout << "delete A" << std::endl;
+	}
+};
+
+void DeleterA(A* a) {
+	delete a;
+
+}
+
+using FunctorA = BT::StaticFunctorWrapper<DeleterA>;
+
 int main()
 {
 	system("chcp 65001");
-	int x = 10;
 	{
-		ScopeExecutor scope{ [](int x,int y)->void {
-			std::cout << "测试" << std::endl;
-			std::cout << "x = " << x-- << std::endl;
-			std::cout << "y = " << y << std::endl;
-		},x, x };
+		ScopeHandle<A, FunctorA> a = new A{};
 	}
-	std::cout << "x = " << x-- << std::endl;
 
-	auto process = SearchProcess(L"notepad.exe");
+	auto process = SearchProcess("Notepad.exe");
 	if (process == nullptr) {
 		std::cout << "Process not found" << std::endl;
 		return -1;

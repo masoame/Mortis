@@ -1,5 +1,7 @@
 #include"Pipe.hpp"
 #include <iostream>
+#include<chrono>
+#include<thread>
 namespace Mortis::Pipe
 {	
 	using namespace std::chrono_literals;

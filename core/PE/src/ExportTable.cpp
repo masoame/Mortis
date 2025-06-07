@@ -3,6 +3,8 @@
 
 #include<array>
 
+#include<sstream>
+
 namespace Mortis::PE::Exp
 {
 	auto GetDirectory(HANDLE ProcessHandle, HMODULE BaseAddress)

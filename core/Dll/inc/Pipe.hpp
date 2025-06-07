@@ -19,8 +19,8 @@ namespace Mortis::Pipe
 		PipeExecutor& operator = (PipeExecutor&) = delete;
 		PipeExecutor& operator = (PipeExecutor&&) = delete;
 	protected:
-		AutoHandle<> _recvPipeH;
-		AutoHandle<> _sendPipeH;
+		ScopeHandle<> _recvPipeH;
+		ScopeHandle<> _sendPipeH;
 
 		bounded_queue<std::vector<char>> _recvQueue;
 		bounded_queue<std::vector<char>> _sendQueue;
@@ -50,8 +50,8 @@ namespace Mortis::Pipe
 	//	static std::mutex OutQueuemtx;
 	//	static std::mutex InQueuemtx;
 
-	//	static AutoHandle<> LogPipeH;
-	//	static AutoHandle<> CtrlPipeH;
+	//	static ScopeHandle<> LogPipeH;
+	//	static ScopeHandle<> CtrlPipeH;
 
 	//	inline const PipeIO& operator<<(auto&& str)const {
 
