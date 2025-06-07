@@ -7,16 +7,26 @@ namespace Mortis
 		requires requires(PurgeFunc f, Args...args) { std::invoke(f, args...); }
 	struct ScopeExecutor
 	{
+	protected:
 		PurgeFunc _func;
 		std::tuple<Args...> _args;
+
+		bool _turnedOff = false;
+	public:
 
 		ScopeExecutor(ScopeExecutor&) = delete;
 		ScopeExecutor(PurgeFunc&& func, Args&& ...args) : _func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<Args>(args)... }
 		{
 		}
 
+		void TurnOff() {
+			_turnedOff = true;
+		}
+
 		~ScopeExecutor() {
-			std::apply(_func, _args);
+			if (!_turnedOff) {
+				std::apply(_func, _args);
+			}
 		}
 	};
 	template<typename PurgeFunc, typename...Args>
@@ -25,7 +35,7 @@ namespace Mortis
 	template<typename PurgeFunc>
 	class ScopeWrapper
 	{
-
+		~ScopeWrapper() {  }
 	};
 	
 	

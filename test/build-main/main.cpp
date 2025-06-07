@@ -8,14 +8,14 @@ using namespace Mortis::PE;
 using namespace Mortis::Hook;
 int main()
 {
-
+	system("chcp 65001");
 	int x = 10;
 	{
-		ScopeExecutor scope{ [](int& x,int y)->void {
-			std::cout << "ScopeExecutor destructor called" << std::endl;
+		ScopeExecutor scope{ [](int x,int y)->void {
+			std::cout << "测试" << std::endl;
 			std::cout << "x = " << x-- << std::endl;
 			std::cout << "y = " << y << std::endl;
-		},std::ref(x), std::move(x) };
+		},x, x };
 	}
 	std::cout << "x = " << x-- << std::endl;
 
