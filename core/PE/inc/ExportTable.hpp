@@ -1,8 +1,6 @@
 #pragma once
 #include "PE.hpp"
 
-#include <vector>
-
 namespace Mortis::PE::Exp
 {
 	//获得导出表目录

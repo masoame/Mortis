@@ -1,17 +1,17 @@
-#include "common.hpp"
+#include <utils.hpp>
 namespace Mortis::Pipe
 {
 	constexpr const auto& LogPipeName = L"\\\\.\\pipe\\LogPipe";
 	constexpr const auto& CtrlPipeName = L"\\\\.\\pipe\\CtrlPipe";
 
-	struct CtrlContext
-	{
-		size_t _len;
-		std::unique_ptr<char[]> buf;
-		CtrlContext(size_t ilen, std::unique_ptr<char[]>&& ibuf)noexcept :_len(ilen), buf(ibuf.release()) {};
-		CtrlContext(CtrlContext&& cf)noexcept :_len(cf._len), buf(cf.buf.release()) {};
-		void operator=(CtrlContext&& cf)noexcept { _len = cf._len; buf = std::move(cf.buf); };
-	};
+	//struct CtrlContext
+	//{
+	//	size_t _len;
+	//	std::unique_ptr<char[]> buf;
+	//	CtrlContext(size_t ilen, std::unique_ptr<char[]>&& ibuf)noexcept :_len(ilen), buf(ibuf.release()) {};
+	//	CtrlContext(CtrlContext&& cf)noexcept :_len(cf._len), buf(cf.buf.release()) {};
+	//	void operator=(CtrlContext&& cf)noexcept { _len = cf._len; buf = std::move(cf.buf); };
+	//};
 
 	class PipeExecutor {
 		PipeExecutor(PipeExecutor&) = delete;

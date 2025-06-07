@@ -1,35 +1,14 @@
-#include <iostream>
-#include "PE.hpp"
 #include "Hook.hpp"
-#include<string>
+
+#include <iostream>
 
 using namespace Mortis;
 using namespace Mortis::PE;
-using namespace Mortis::Hook;
-
-struct A {
-	int _a;
-	int _b;
-	A() {};
-	~A() {
-		std::cout << _a << std::endl;
-		std::cout << "delete A" << std::endl;
-	}
-};
-
-void DeleterA(A* a) {
-	delete a;
-
-}
-
-using FunctorA = BT::StaticFunctorWrapper<DeleterA>;
+using namespace Mortis::SysIntVecDbg;
 
 int main()
 {
 	system("chcp 65001");
-	{
-		ScopeHandle<A, FunctorA> a = new A{};
-	}
 
 	auto process = SearchProcess("Notepad.exe");
 	if (process == nullptr) {

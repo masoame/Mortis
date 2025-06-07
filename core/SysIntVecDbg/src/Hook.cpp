@@ -1,6 +1,9 @@
+#include <utils.hpp>
+
 #include"asm_types.hpp"
 #include "Hook.hpp"
-#include "common.hpp"
+
+
 #include "ExportTable.hpp"
 
 #include<windows.h>
@@ -12,7 +15,7 @@
 #include<map>
 #include<future>
 
-namespace Mortis::Hook {
+namespace Mortis::SysIntVecDbg {
 
 	DWORD InjectDll(DWORD th32ProcessID, const wchar_t* dll)
 	{

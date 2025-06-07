@@ -1,3 +1,5 @@
+#pragma once
+
 #include<base_template.hpp>
 #include<mutex>
 #include<deque>

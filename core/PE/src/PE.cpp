@@ -1,12 +1,5 @@
 #include "PE.hpp"
-#include"asm_types.hpp"
-#include "common.hpp"
 
-#include<windows.h>
-#include<iostream>
-#include<sstream>
-#include<filesystem>
-#include<thread>
 
 namespace Mortis::PE {
 

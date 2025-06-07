@@ -1,4 +1,5 @@
-#include <common.hpp>
+#pragma once
+#include <utils.hpp>
 
 
 namespace DllHook

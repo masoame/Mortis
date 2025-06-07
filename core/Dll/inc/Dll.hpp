@@ -1,4 +1,5 @@
-#include <hook_types.hpp>
+#include<PE.hpp>
+
 
 namespace DllHook 
 {

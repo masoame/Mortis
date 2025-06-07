@@ -1,7 +1,6 @@
 #include "ImportTable.hpp"
 #include "asm_types.hpp"
 
-#include<sstream>
 
 namespace Mortis::PE::Imp
 {

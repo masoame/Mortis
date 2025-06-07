@@ -1,5 +1,4 @@
 #include "Dll.hpp"
-#include "common.hpp"
 
 BOOL APIENTRY DllMain([[maybe_unused]] HMODULE hModule, [[maybe_unused]] DWORD  ul_reason_for_call, [[maybe_unused]] LPVOID lpReserved)
 {

@@ -1,20 +1,20 @@
 #pragma once
 
-#include<windows.h>
-#include<tlhelp32.h>
+#include <PE.hpp>
 
-#include<string>
-#include<vector>
-#include<memory>
-#include<common.hpp>
+
+
+
+
+
+
 #include<functional>
 #include<sstream>
 #include<map>
 #include<atomic>
-
 #include<future>
 
-namespace Mortis::Hook
+namespace Mortis::SysIntVecDbg
 {
 	std::future<bool> CreateDebugThread();
 
