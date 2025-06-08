@@ -24,8 +24,8 @@ int main()
 	std::wcout << L"Module found: " << _module->szModule << std::endl;
 
 	const auto hProcess = OpenProcessHandle(process);
-	//FunctionPtr pfWriteFile = Exp::GetProcAddressEx(hProcess, _module->hModule, "WriteFile");
-	//std::cout << pfWriteFile << std::endl;
+	const auto pWriteFile = Exp::GetProcAddressEx(hProcess, _module->hModule, "WriteFile");
+	std::cout << pWriteFile << std::endl;
 
 	auto pfn = HookPrc(process->th32ProcessID, _module->hModule, "WriteFile",[]
 	{

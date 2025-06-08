@@ -9,7 +9,7 @@ namespace Mortis::PE
 		-> ScopeHandle<>
 	{
 		constexpr static auto isId = std::is_same_v<DWORD, HasIdType>;
-		if constexpr (isId)  {
+		if constexpr (isId) {
 			return OpenProcess(dwDesiredAccess, bInheritHandle, hasIdType);
 		} else {
 			return OpenProcess(dwDesiredAccess, bInheritHandle, hasIdType->th32ProcessID);
