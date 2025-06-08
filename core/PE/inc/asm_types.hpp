@@ -1,13 +1,5 @@
 #pragma once
 
-#include <utils.hpp>
-
-#ifdef _WIN32
-
-constexpr const BYTE INT3 = 0xCC;
-constexpr const BYTE NOP = 0x90;
-constexpr const BYTE RET = 0xC3;
-
 //// pchooks.cc
 //// 8/1/2014 jichi
 //#include "pchooks.h"
@@ -314,11 +306,6 @@ constexpr const BYTE RET = 0xC3;
 //// EOF
 
 
-#endif
 
-template<typename AddressType = LPVOID>
-inline auto MakeAddress(auto address, auto offset) noexcept -> LPVOID {
-	return reinterpret_cast<AddressType>(reinterpret_cast<SIZE_T>(address) + offset);
-};
 
 

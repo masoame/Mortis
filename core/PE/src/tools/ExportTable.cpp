@@ -47,27 +47,26 @@ namespace Mortis::PE::Exp
 		if (Namestable.empty()) {
 			return {};
 		}
-		std::vector<std::tuple<Ordinal, Rva, std::string>> ExportTable{ ExpDir->NumberOfNames ,{} };
+		std::vector<std::tuple<Ordinal, Rva, std::string>> ExportTable{ ExpDir->NumberOfNames,{} };
 
 		std::array<char, 256> ProcName;
-		Rva Prc_RVA = 0;
-		Ordinal ordinals = 0;
 
 		for (DWORD i = 0; i != ExpDir->NumberOfNames; i++) {
+
+			auto& [ordinal, rva, procName] = ExportTable[i];
 
 			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, Namestable[i]), ProcName.data(), ProcName.size() - 1, 0) == false) {
 				return {};
 			}
-			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ExpDir->AddressOfNameOrdinals + sizeof(int16_t) * i), &ordinals, sizeof(int16_t), 0) == false) {
-				return {};
-			}
-			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ExpDir->AddressOfFunctions + (ordinals - ExpDir->Base + 1) * sizeof(int32_t)), &Prc_RVA, sizeof(int32_t), 0) == false) {
-				return {};
-			}
 
-			std::get<0>(ExportTable[i]) = static_cast<Ordinal>(ordinals + ExpDir->Base);
-			std::get<1>(ExportTable[i]) = Prc_RVA;
-			std::get<2>(ExportTable[i]) = ProcName.data();
+			procName = ProcName.data();
+
+			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ExpDir->AddressOfNameOrdinals + sizeof(int16_t) * i), &ordinal, sizeof(int16_t), 0) == false) {
+				return {};
+			}
+			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ExpDir->AddressOfFunctions + (ordinal - ExpDir->Base + 1) * sizeof(int32_t)), &rva, sizeof(int32_t), 0) == false) {
+				return {};
+			}
 		}
 		return ExportTable;
 	}

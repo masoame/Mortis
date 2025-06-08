@@ -1,5 +1,4 @@
-#pragma once
-#include "PE.hpp"
+#include "PE.h"
 
 namespace Mortis::PE::Imp
 {
@@ -18,3 +17,5 @@ namespace Mortis::PE::Imp
 	auto ShowTable(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> ::std::unique_ptr<std::stringstream>;
 }
+
+#include <ImportTable.hpp>
