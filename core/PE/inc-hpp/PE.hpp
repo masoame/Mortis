@@ -3,6 +3,19 @@
 
 namespace Mortis::PE
 {
+	template<typename HasIdType>
+		requires BC::HasType<HasIdType, PROCESSENTRY32*, PROCESSENTRY32W*, std::unique_ptr<PROCESSENTRY32>, std::unique_ptr<PROCESSENTRY32W>, DWORD>
+	auto OpenProcessHandle(const HasIdType& hasIdType, DWORD dwDesiredAccess , BOOL bInheritHandle)
+		-> ScopeHandle<>
+	{
+		constexpr static auto isId = std::is_same_v<DWORD, HasIdType>;
+		if constexpr (isId)  {
+			return OpenProcess(dwDesiredAccess, bInheritHandle, hasIdType);
+		} else {
+			return OpenProcess(dwDesiredAccess, bInheritHandle, hasIdType->th32ProcessID);
+		}
+	}
+
 	template<typename ProcessNameType, typename UseWrapper , typename PROCESSENTRY32Wrapper>
 		requires BC::SearchProcessConcept<ProcessNameType, PROCESSENTRY32Wrapper>
 	auto SearchProcess(const ProcessNameType& processName) -> std::unique_ptr<PROCESSENTRY32Wrapper>

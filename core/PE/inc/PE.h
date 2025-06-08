@@ -6,11 +6,18 @@
 
 namespace Mortis::PE
 {
+
+	template<typename HasIdType>
+		requires BC::HasType<HasIdType, PROCESSENTRY32* , PROCESSENTRY32W*, std::unique_ptr<PROCESSENTRY32>, std::unique_ptr<PROCESSENTRY32W>, DWORD>
+	auto OpenProcessHandle(const HasIdType& hasIdType, DWORD dwDesiredAccess = PROCESS_ALL_ACCESS, BOOL bInheritHandle = FALSE)
+		-> ScopeHandle<>;
+
 	//搜索进程
 	template<typename ProcessNameType, typename UseWrapper = BT::SearchProcessWrapper<ProcessNameType>, typename PROCESSENTRY32Wrapper = UseWrapper::TYPE::PROCESSENTRY32Wrapper>
 		requires BC::SearchProcessConcept<ProcessNameType, PROCESSENTRY32Wrapper>
 	auto SearchProcess(const ProcessNameType& processName) 
 		-> std::unique_ptr<PROCESSENTRY32Wrapper>;
+
 
 	//搜索模块
 	template<typename ModuleNameType, typename UseWrapper = BT::SearchModuleWrapper<ModuleNameType>, typename MODULEENTRY32Wrapper = UseWrapper::TYPE::MODULEENTRY32Wrapper>
@@ -35,3 +42,5 @@ namespace Mortis::PE
 }
 
 #include<PE.hpp>
+#include<ExportTable.hpp>
+#include<ImportTable.hpp>

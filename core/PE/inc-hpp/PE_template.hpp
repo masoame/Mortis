@@ -7,7 +7,6 @@ namespace Mortis::BT
 	template<typename T1>
 	struct SearchModuleWrapper {
 		inline static constexpr bool is_wide = not (std::is_convertible_v<T1, std::string> || std::is_same_v<T1, std::string_view>);
-		inline static constexpr bool is_raw_ptr = not std::is_same_v<T1, std::conditional_t<is_wide, std::wstring, std::string>>;
 		using TYPE = PE::TYPE<is_wide>;
 		using API = PE::API<is_wide>;
 	};
@@ -15,7 +14,6 @@ namespace Mortis::BT
 	template<typename T1>
 	struct SearchProcessWrapper {
 		inline static constexpr bool is_wide = not (std::is_convertible_v<T1, std::string> || std::is_same_v<T1, std::string_view>);
-		inline static constexpr bool is_raw_ptr = not BC::HasType<T1, std::wstring, std::string, std::string_view, std::wstring_view>;
 		using TYPE = PE::TYPE<is_wide>;
 		using API = PE::API<is_wide>;
 	};

@@ -19,7 +19,14 @@ namespace Mortis::PE::Exp
 	auto ShowTable(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::stringstream;
 
-	//查找导出函数地址
+	//导出函数地址
+	auto GetProcAddressEx(HANDLE ProcessHandle, HMODULE BaseAddress, std::string_view fcName)
+		-> FunctionPtr;
+
+	//批量找出导出函数地址
+	auto GetProcAddressEx(const HANDLE ProcessHandle, const HMODULE BaseAddress, const std::vector<std::string_view>& fcNameGroup)
+		-> std::vector<FunctionPtr>;
+
 	template<typename FuncPtr>
 	auto GetProcAddressEx(HANDLE ProcessHandle, HMODULE BaseAddress, std::string_view fcName)
 		-> FuncPtr;

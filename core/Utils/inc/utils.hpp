@@ -10,6 +10,7 @@
 #include<optional>
 #include<vector>
 #include<map>
+#include<array>
 
 
 #include<base_api.hpp>

@@ -10,7 +10,7 @@ int main()
 {
 	system("chcp 65001");
 
-	auto process = SearchProcess("Notepad.exe");
+	auto process = SearchProcess(L"Notepad.exe");
 	if (process == nullptr) {
 		std::cout << "Process not found" << std::endl;
 		return -1;
@@ -22,6 +22,11 @@ int main()
 		return -1;
 	}
 	std::wcout << L"Module found: " << _module->szModule << std::endl;
+
+	const auto hProcess = OpenProcessHandle(process);
+	//FunctionPtr pfWriteFile = Exp::GetProcAddressEx(hProcess, _module->hModule, "WriteFile");
+	//std::cout << pfWriteFile << std::endl;
+
 	auto pfn = HookPrc(process->th32ProcessID, _module->hModule, "WriteFile",[]
 	{
 		static int count = 0;
