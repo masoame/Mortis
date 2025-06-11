@@ -1,10 +1,12 @@
-#include <utils.hpp>
+#include<ScopeHandle.hpp>
+#include <bounded_queue.hpp>
 namespace Mortis::Pipe
 {
 	constexpr const auto& LogPipeName = L"\\\\.\\pipe\\LogPipe";
 	constexpr const auto& CtrlPipeName = L"\\\\.\\pipe\\CtrlPipe";
 
-	class PipeExecutor {
+	class PipeExecutor 
+	{
 		PipeExecutor(PipeExecutor&) = delete;
 		PipeExecutor(PipeExecutor&& ) = delete;
 		PipeExecutor& operator = (PipeExecutor&) = delete;
@@ -28,39 +30,4 @@ namespace Mortis::Pipe
 			return instance;
 		}
 	};
-
-
-
-
-	//struct PipeIO
-	//{
-	//	static std::thread pipeInit;
-
-	//	static std::queue<std::string> OutQueue;
-	//	static std::queue<CtrlContext> InQueue;
-	//	static std::mutex OutQueuemtx;
-	//	static std::mutex InQueuemtx;
-
-	//	static ScopeHandle<> LogPipeH;
-	//	static ScopeHandle<> CtrlPipeH;
-
-	//	inline const PipeIO& operator<<(auto&& str)const {
-
-	//		ss << std::forward<decltype(str)>(str);
-	//		std::unique_lock lockqueue(OutQueuemtx);
-	//		std::unique_lock lockss(ssmtx);
-	//		OutQueue.emplace(ss.str());
-	//		ss.str("");
-	//		ss.clear();
-	//		return *this;
-
-	//	}
-
-	//	inline const PipeIO& operator>>(CtrlContext& cf) const;
-	//private:
-	//	static std::stringstream ss;
-	//	static std::mutex ssmtx;
-	//};
-	//extern const PipeIO pout, pin, io;
-	//extern const std::string pendl;
 }
