@@ -1,13 +1,6 @@
 #pragma once
 
 #include <PE.hpp>
-
-
-
-
-
-
-
 #include<functional>
 #include<sstream>
 #include<map>

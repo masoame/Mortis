@@ -3,10 +3,9 @@
 #include<thread>
 
 #include<PipeExecutor.hpp>
+using namespace std::chrono_literals;
 namespace Mortis::Pipe
 {	
-	using namespace std::chrono_literals;
-
 	PipeExecutor::PipeExecutor()
 	{
 		_sendPipeH = CreateNamedPipeW(LogPipeName, PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE, 1, 0, 0, 0, nullptr);
