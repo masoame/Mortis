@@ -19,6 +19,8 @@ namespace Mortis::Pipe
 
 		std::jthread _recvThr;
 		std::jthread _sendThr;
+		PipeExecutor();
+		~PipeExecutor() {
 
 
 		PipeExecutor();
