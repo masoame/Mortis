@@ -40,8 +40,9 @@ namespace Mortis::PE::Imp
 			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ImpDes.OriginalFirstThunk + (i * sizeof(IMAGE_THUNK_DATA))), &_INT, sizeof(IMAGE_THUNK_DATA), 0) == false) {
 				break;
 			}
-			if (_INT.u1.Ordinal == 0) break;
-
+			if (_INT.u1.Ordinal == 0) {
+				break;
+			}
 			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ImpDes.FirstThunk + (i * sizeof(IMAGE_THUNK_DATA))), &_IAT, sizeof(IMAGE_THUNK_DATA), 0) == false) {
 				break;
 			}
