@@ -52,4 +52,9 @@ namespace Mortis::Pipe
 			}
 		});
 	}
+
+	PipeExecutor::~PipeExecutor()
+	{
+
+	}
 }

@@ -21,10 +21,14 @@ namespace Mortis::Pipe
 		std::jthread _recvThr;
 		std::jthread _sendThr;
 		PipeExecutor();
-		~PipeExecutor() {
+		~PipeExecutor();
 
-		}
+
+		PipeExecutor();
+		~PipeExecutor();
 	public:
+
+
 		static PipeExecutor& Instance() {
 			static PipeExecutor instance;
 			return instance;
