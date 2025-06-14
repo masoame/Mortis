@@ -1,8 +1,6 @@
 #pragma once
+#include<utils.hpp>
 
-#include<base_template.hpp>
-#include<mutex>
-#include<deque>
 namespace Mortis
 {
 	template<class T>

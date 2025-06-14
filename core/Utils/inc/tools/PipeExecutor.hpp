@@ -1,4 +1,5 @@
-#include <utils.hpp>
+#include<ScopeHandle.hpp>
+#include <bounded_queue.hpp>
 namespace Mortis::Pipe
 {
 	constexpr const auto& LogPipeName = L"\\\\.\\pipe\\LogPipe";
