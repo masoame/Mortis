@@ -1,4 +1,4 @@
-project(Dll LANGUAGES CXX)
+project(InjectDLL LANGUAGES CXX)
 
 file(GLOB SRC_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 

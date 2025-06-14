@@ -1,17 +1,17 @@
 #include "ImportTable.hpp"
 #include "asm_types.hpp"
 
-
 namespace Mortis::PE::Imp
 {
 	auto GetDescriptorGroup(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::vector<IMAGE_IMPORT_DESCRIPTOR>
 	{
-		auto FileHeader = PE::GetFileHeader(ProcessHandle, BaseAddress);
-		if (FileHeader == nullptr)
-			return {};
-
 		std::vector<IMAGE_IMPORT_DESCRIPTOR> ImpDes{};
+
+		const auto FileHeader = PE::GetFileHeader(ProcessHandle, BaseAddress);
+		if (FileHeader == nullptr) {
+			return ImpDes;
+		}
 
 		ImpDes.emplace_back();
 		for (int i = 0;; i++) {

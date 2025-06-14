@@ -4,14 +4,25 @@
 
 namespace Mortis
 {
+	template<typename HandleType, typename DeleteFunc>
+	concept ScopeHandleConcept = requires(HandleType handle, DeleteFunc func) {
+		requires BC::NotConst<HandleType>&& BC::NotRef<HandleType>&& BC::NotConst<HandleType>;
+		requires BC::IsStaticFunctor<DeleteFunc>;
+		requires BC::CanCall<typename DeleteFunc::value_type, 
+		std::conditional_t<std::is_pointer_v<HandleType>, HandleType, HandleType*>, 
+			std::conditional_t<std::is_pointer_v<HandleType>, HandleType*, HandleType**>>;
+	};
 
-	template<class HandleType, class DeleteFunc, class Wrapper = BT::ScopeHandleWrapper<HandleType, DeleteFunc>>
-		requires BC::CanCall<typename DeleteFunc::value_type, typename Wrapper::Ptr, typename Wrapper::SecPtr>
-	class ScopeHandle
+	template<typename HandleType, typename DeleteFunc>
+		requires ScopeHandleConcept<HandleType, DeleteFunc>
+	struct ScopeHandleWrapper;
+
+	template<class HandleType, class DeleteFunc>
+	class ScopeHandle : public ScopeHandleWrapper<HandleType, DeleteFunc>
 	{
-		using unique_ptr = Wrapper::unique_ptr;
-		using Ptr = Wrapper::Ptr;
-		using SecPtr = Wrapper::SecPtr;
+		using unique_ptr = ScopeHandleWrapper<HandleType, DeleteFunc>::unique_ptr;
+		using Ptr = ScopeHandleWrapper<HandleType, DeleteFunc>::Ptr;
+		using SecPtr = ScopeHandleWrapper<HandleType, DeleteFunc>::SecPtr;
 
 		unique_ptr _ptr;
 	public:
@@ -68,7 +79,32 @@ namespace Mortis
 		}
 	};
 
-	template<class HandleType = HANDLE, class DeleteFunc = BT::StaticFunctorWrapper<CloseHandle>, class Wrapper>
-		requires BC::CanCall<typename DeleteFunc::value_type, typename Wrapper::Ptr, typename Wrapper::SecPtr>
+	template<class HandleType = HANDLE, class DeleteFunc = BT::StaticFunctorWrapper<CloseHandle>>
 	class ScopeHandle;
+
+	template<typename HandleType, typename DeleteFunc>
+		requires ScopeHandleConcept<HandleType, DeleteFunc>
+	struct ScopeHandleWrapper
+	{
+		constexpr static bool isPtr = std::is_pointer_v<HandleType>;
+		using UniqueType = std::conditional_t<isPtr, std::remove_pointer_t<HandleType>, HandleType>;
+		using Ptr = UniqueType*;
+		using SecPtr = Ptr*;
+
+		constexpr static bool isSecPtr = not std::is_invocable_v<typename DeleteFunc::value_type, Ptr>;
+
+		struct DeletePrimaryPtr {
+			void operator()(void* ptr) {
+				DeleteFunc()(static_cast<Ptr>(ptr));
+			}
+		};
+		struct DeleteSecPtr {
+			void operator()(void* ptr) {
+				DeleteFunc()(reinterpret_cast<SecPtr>(&ptr));
+			}
+		};
+
+		using DeletePtr = std::conditional_t<isSecPtr, DeleteSecPtr, DeletePrimaryPtr>;
+		using unique_ptr = std::unique_ptr<UniqueType, DeletePtr>;
+	};
 }

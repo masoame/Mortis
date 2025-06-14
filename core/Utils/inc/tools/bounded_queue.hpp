@@ -1,8 +1,6 @@
 #pragma once
+#include<utils.hpp>
 
-#include<base_template.hpp>
-#include<mutex>
-#include<deque>
 namespace Mortis
 {
 	template<class T>
@@ -12,14 +10,14 @@ namespace Mortis
 	public:
 		bounded_queue(std::size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
 
-		~bounded_queue() {
+		~bounded_queue() noexcept {
 			_is_closed = true;
 			_cv_could_push.notify_all();
 			_cv_could_pop.notify_all();
 		}
 
 		template<typename... Args>
-		void emplace(Args&&... args) noexcept {
+		void emplace(Args&&... args) {
 			std::unique_lock lock(_mtx);
 			_cv_could_push.wait(lock, 
 				[this] { 
