@@ -28,7 +28,7 @@ namespace Mortis::BC
 
 	template<typename T>
 	concept IsString = requires {
-		requires std::convertible_to<T, std::string> || std::convertible_to<T, std::wstring> || IsSameType<T, std::string_view, std::wstring_view>;
+		requires std::convertible_to<T, std::string_view> || std::convertible_to<T, std::wstring_view>;
 	};
 
 	template<typename T1, typename T2>

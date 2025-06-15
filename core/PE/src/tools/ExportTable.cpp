@@ -80,25 +80,25 @@ namespace Mortis::PE::Exp
 	}
 
 	auto GetProcAddressEx(HANDLE ProcessHandle, HMODULE BaseAddress, std::string_view fcName)
-		-> FunctionPtr
+		-> FuncPtr
 	{
 		const auto ExpTable = GetTable(ProcessHandle, BaseAddress);
 		for (const auto& [ordinal, addr, name] : ExpTable) {
 			if (name == fcName) {
-				return reinterpret_cast<FunctionPtr>(MakeAddress(BaseAddress, addr));
+				return reinterpret_cast<FuncPtr>(MakeAddress(BaseAddress, addr));
 			}
 		}
 		return nullptr;
 	}
 
 	auto GetProcAddressEx(const HANDLE ProcessHandle, const HMODULE BaseAddress, const std::vector<std::string_view>& fcNameGroup)
-		-> std::vector<FunctionPtr>
+		-> std::vector<FuncPtr>
 	{
 		const auto ExpTable = GetTable(ProcessHandle, BaseAddress);
-		std::vector<FunctionPtr> result;
+		std::vector<FuncPtr> result;
 		for (const auto& [ordinal, addr, name] : ExpTable) {
 			if (std::find(fcNameGroup.begin(), fcNameGroup.end(), name) != fcNameGroup.end()) {
-				result.emplace_back(reinterpret_cast<FunctionPtr>(MakeAddress(BaseAddress, addr)));
+				result.emplace_back(reinterpret_cast<FuncPtr>(MakeAddress(BaseAddress, addr)));
 			}
 		}
 		return result;

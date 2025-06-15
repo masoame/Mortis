@@ -11,7 +11,9 @@ namespace Mortis::PE
 	using Rva = DWORD;
 	using Ordinal = WORD;
 	using Hint = WORD;
-	using FunctionPtr = LPVOID;
+	using FuncPtr = LPVOID;
+	using FuncArgc = unsigned char;
+
 
 	template<bool is_wide>
 	struct TYPE : public BaseTYPE<is_wide> {
