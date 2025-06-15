@@ -25,9 +25,7 @@ int main()
 {
 	system("chcp 65001");
 
-	HookContext ctx(test);
-
-	auto type_map = ctx.refl_args_positions_map<A,B,C>();
+	auto type_map = HookContext(test).refl_args_positions_map<A,B,C>();
 	
 	for (auto const& [key, val] : type_map) {
 		std::cout << key << ": ";
