@@ -18,8 +18,8 @@ namespace Mortis::Pipe
 		bounded_queue<std::vector<char>> _recv_queue;
 		bounded_queue<std::vector<char>> _send_queue;
 
-		std::jthread _recvThr;
-		std::jthread _sendThr;
+		std::jthread _recv_thr;
+		std::jthread _send_thr;
 
 		PipeExecutor();
 		~PipeExecutor();

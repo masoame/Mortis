@@ -10,7 +10,7 @@ namespace Mortis::Pipe
 	{
 		_send_pipe_handle = CreateNamedPipeW(LogPipeName, PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE, 1, 0, 0, 0, nullptr);
 		_recv_pipe_handle = CreateNamedPipeW(CtrlPipeName, PIPE_ACCESS_INBOUND, PIPE_READMODE_BYTE, 1, 0, 0, 0, nullptr);
-		_sendThr = std::jthread([this](std::stop_token st)
+		_send_thr = std::jthread([this](std::stop_token st)
 		{
 			while (st.stop_requested() == false)
 			{
@@ -38,7 +38,7 @@ namespace Mortis::Pipe
 			}
 		});
 
-		_recvThr = std::jthread([this](std::stop_token st)
+		_recv_thr = std::jthread([this](std::stop_token st)
 		{
 			while (st.stop_requested() == false)
 			{
