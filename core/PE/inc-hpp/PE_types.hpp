@@ -12,7 +12,7 @@ namespace Mortis::PE
 	using Ordinal = WORD;
 	using Hint = WORD;
 	using FuncPtr = LPVOID;
-	using FuncArgc = unsigned char;
+	using FuncArgPos = unsigned char;
 
 
 	template<bool is_wide>

@@ -1,13 +1,15 @@
+#pragma once
 #include<PE.h>
-
+#include <ranges>  
 namespace Mortis::PE
 {
-	struct HookContext
+	template<typename FuncPtrType>
+	struct HookContext : public ReflFunc<FuncPtrType>
 	{
-		FuncPtr _function_address = nullptr;
-
-		std::strong_ordering operator <=> (const HookContext& hook_context) {
-			return hook_context._function_address <=> _function_address;
-		}
+		HookContext(FuncPtrType func_ptr) : 
+			ReflFunc<FuncPtrType>(func_ptr) {}
 	};
+
+
+
 }
