@@ -19,7 +19,7 @@ namespace Mortis::BT
 	};
 
 	template<typename T>
-		requires BC::HasType<T, char, wchar_t>
+		requires BC::IsSameType<T, char, wchar_t>
 	struct ProcessInfoWrapper {
 		inline static constexpr bool is_wide = std::is_same_v<T, wchar_t>;
 		using TYPE = PE::TYPE<is_wide>;
@@ -27,7 +27,7 @@ namespace Mortis::BT
 	};
 
 	template<typename T>
-		requires BC::HasType<T, char, wchar_t>
+		requires BC::IsSameType<T, char, wchar_t>
 	struct ModuleInfoWrapper {
 		inline static constexpr bool is_wide = std::is_same_v<T, wchar_t>;
 		using TYPE = PE::TYPE<is_wide>;

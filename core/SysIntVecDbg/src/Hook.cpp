@@ -56,7 +56,7 @@ namespace Mortis::SysIntVecDbg {
 	}
 
 
-	std::optional<std::pair<PE::FunctionPtr, BYTE>> SetBreakPoint(const HANDLE hProcess, const LPVOID lpfc)
+	std::optional<std::pair<PE::FuncPtr, BYTE>> SetBreakPoint(const HANDLE hProcess, const LPVOID lpfc)
 	{
 		if (lpfc == nullptr || hProcess == nullptr)
 			return std::nullopt;
@@ -70,9 +70,9 @@ namespace Mortis::SysIntVecDbg {
 		return { { lpfc , code } };
 	}
 
-	std::map<LPVOID, BYTE> SetBreakPoint(const HANDLE hProcess, const std::vector<PE::FunctionPtr>& lpfcs)
+	std::map<LPVOID, BYTE> SetBreakPoint(const HANDLE hProcess, const std::vector<PE::FuncPtr>& lpfcs)
 	{
-		std::map<PE::FunctionPtr, BYTE> dbg_tb;
+		std::map<PE::FuncPtr, BYTE> dbg_tb;
 		for (const auto& lpfc : lpfcs) {
 			if (auto opt = SetBreakPoint(hProcess, lpfc); opt.has_value()) {
 				dbg_tb.insert(opt.value());
@@ -137,7 +137,7 @@ namespace Mortis::SysIntVecDbg {
 		if (DebugActiveProcess(th32ProcessID) == FALSE)
 			return false;
 
-		PE::FunctionPtr lpfc = 0;
+		PE::FuncPtr lpfc = 0;
 		BYTE code = 0;
 		DEBUG_EVENT de;
 		DWORD dcstatus;

@@ -1,3 +1,4 @@
+#pragma once
 #include<ScopeHandle.hpp>
 #include <bounded_queue.hpp>
 namespace Mortis::Pipe
@@ -8,23 +9,22 @@ namespace Mortis::Pipe
 	class PipeExecutor 
 	{
 		PipeExecutor(PipeExecutor&) = delete;
-		PipeExecutor(PipeExecutor&& ) = delete;
+		PipeExecutor(PipeExecutor&&) = delete;
 		PipeExecutor& operator = (PipeExecutor&) = delete;
 		PipeExecutor& operator = (PipeExecutor&&) = delete;
 	protected:
-		ScopeHandle<> _recvPipeH;
-		ScopeHandle<> _sendPipeH;
-
-		bounded_queue<std::vector<char>> _recvQueue;
-		bounded_queue<std::vector<char>> _sendQueue;
-
-		std::jthread _recvThr;
-		std::jthread _sendThr;
 		PipeExecutor();
 		~PipeExecutor();
+		ScopeHandle<> _recv_pipe_handle;
+		ScopeHandle<> _send_pipe_handle;
+
+		bounded_queue<std::vector<char>> _recv_queue;
+		bounded_queue<std::vector<char>> _send_queue;
+
+		std::jthread _recv_thr;
+		std::jthread _send_thr;
 
 	public:
-
 
 		static PipeExecutor& Instance() {
 			static PipeExecutor instance;

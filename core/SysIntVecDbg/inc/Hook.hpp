@@ -1,15 +1,9 @@
 #pragma once
 #include <PE.hpp>
 
-#include<functional>
-#include<sstream>
-#include<map>
-#include<atomic>
-#include<future>
 
 namespace Mortis::SysIntVecDbg
 {
-	std::future<bool> CreateDebugThread();
 
 	//勾取相应函数
 	bool HookPrc(DWORD th32ProcessID, HMODULE hModule, const char* HookFunction, const std::function<void()>& OnHooked);
