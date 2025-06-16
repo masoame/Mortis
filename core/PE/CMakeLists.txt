@@ -5,7 +5,7 @@ file(GLOB SRC_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/tools/*.cpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} "inc/tools/HookContext.h")
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
 	${CMAKE_CURRENT_SOURCE_DIR}/inc

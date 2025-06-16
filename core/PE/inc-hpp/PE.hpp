@@ -4,7 +4,7 @@
 namespace Mortis::PE
 {
 	template<typename HasIdType>
-		requires BC::HasType<HasIdType, PROCESSENTRY32*, PROCESSENTRY32W*, std::unique_ptr<PROCESSENTRY32>, std::unique_ptr<PROCESSENTRY32W>, DWORD>
+		requires BC::IsSameType<HasIdType, PROCESSENTRY32*, PROCESSENTRY32W*, std::unique_ptr<PROCESSENTRY32>, std::unique_ptr<PROCESSENTRY32W>, DWORD>
 	auto OpenProcessHandle(const HasIdType& hasIdType, DWORD dwDesiredAccess , BOOL bInheritHandle)
 		-> ScopeHandle<>
 	{
@@ -57,7 +57,8 @@ namespace Mortis::PE
 		BOOL bFound = UseWrapper::API::Module32FirstWrapper()(hProcessSnap, module_entry.get());
 		while (bFound)
 		{
-			if (UseWrapper::TYPE::StringViewWrapper(module_entry->szModule) == module_name_view) {
+			if (CaseInsensitiveCompare(module_name_view, 
+				UseWrapper::TYPE::StringViewWrapper(module_entry->szModule))){
 				return module_entry;
 			}
 			bFound = UseWrapper::API::Module32NextWrapper()(hProcessSnap, module_entry.get());
