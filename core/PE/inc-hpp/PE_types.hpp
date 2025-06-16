@@ -4,6 +4,16 @@
 
 namespace Mortis::PE
 {
+#ifndef _WIN64
+	using HOOKWORD = DWORD32;
+#else
+	using HOOKWORD = DWORD64;
+#endif
+
+	enum INT_CODE {
+		//INT3 = 0xCC
+	};
+
 	constexpr const BYTE INT3 = 0xCC;
 	constexpr const BYTE NOP = 0x90;
 	constexpr const BYTE RET = 0xC3;

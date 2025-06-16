@@ -10,6 +10,7 @@ namespace DllHook
 #else
 	using HOOKWORD = DWORD64;
 #endif
+
 	std::unique_ptr<HOOKWORD[]> GetFuncArgs(const CONTEXT* ct, const HOOKWORD argc);
 
 	struct DebugRegister
