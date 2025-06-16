@@ -19,14 +19,10 @@ class C {
 void test(A a,A b,A c,B d,C e) {
 	a, b, c, d, e;
 }
-
-
 int main()
 {
 	system("chcp 65001");
-
 	auto type_map = HookContext(test).refl_args_positions_map<A,B,C>();
-	
 	for (auto const& [key, val] : type_map) {
 		std::cout << key << ": ";
 		for (auto const& pos : val) {

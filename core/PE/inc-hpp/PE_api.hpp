@@ -12,7 +12,8 @@ namespace Mortis::PE
 	};
 
 	template<typename AddressType = LPVOID>
-	inline auto MakeAddress(auto address, auto offset) noexcept -> LPVOID {
+	inline auto MakeAddress(auto address, auto offset) noexcept 
+		-> LPVOID {
 		return reinterpret_cast<AddressType>(reinterpret_cast<SIZE_T>(address) + offset);
 	};
 
