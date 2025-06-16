@@ -6,11 +6,17 @@ namespace Mortis::PE
 {
 	class HookExecutor
 	{
-		HookExecutor();
+		HookExecutor() {};
+		~HookExecutor() {};
+	public:
+
+		HookExecutor* Instance() {
+			static HookExecutor instance;
+			return &instance;
+		}
 
 		template<typename FuncPtrType>
-		inline void HookExecutor::RegHook(HookContext<FuncPtrType> ctx)
-		{
+		inline void RegHook(HookContext<FuncPtrType> ctx){
 			auto A = ctx.refl_args_positions_map();
 		}
 	};

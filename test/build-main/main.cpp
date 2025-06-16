@@ -34,9 +34,7 @@ int main()
 		}
 		std::cout << std::endl;
 	}
-	
-	
-	//constexpr auto tuple_len =  std::tuple_size<decltype(arr)>::value;
+
 
 	//auto process = SearchProcess(L"Notepad.exe");
 	//if (process == nullptr) {
