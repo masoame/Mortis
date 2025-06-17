@@ -19,15 +19,28 @@ class C {
 void test(A a,A b,A c,B d,C e) {
 	a, b, c, d, e;
 }
-
+void test1(const char* a, const wchar_t* b, const char8_t* c) {
+	a, b, c;
+}
 
 int main()
 {
 	system("chcp 65001");
 
-	auto type_map = HookContext(test).refl_args_positions_map<A,B,C>();
-	
-	for (auto const& [key, val] : type_map) {
+	auto type_map1 = HookContext(test).refl_args_positions_map<A,B,C>();
+	for (auto const& [key, val] : type_map1) {
+		std::cout << key << ": ";
+		for (auto const& pos : val) {
+			std::cout << pos << " ";
+		}
+		std::cout << std::endl;
+	}
+
+	auto type_map2 = HookContext(test1).refl_args_positions_map<const char*, const wchar_t*, const char8_t*>();
+	for (auto const& [key, val] : type_map2) {
+		if (val.empty()) {
+			break;
+		}
 		std::cout << key << ": ";
 		for (auto const& pos : val) {
 			std::cout << pos << " ";
