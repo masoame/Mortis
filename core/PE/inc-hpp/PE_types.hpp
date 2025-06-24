@@ -10,11 +10,12 @@ namespace Mortis::PE
 	using HOOKWORD = DWORD64;
 #endif
 
-	enum class IntCode {
-		INT3 = 0xCC
+	enum IntCode {
+		//INT3 = 0xCC,
+		INT1 = 0xCD01,
 	};
 
-	//constexpr const BYTE INT3 = 0xCC;
+	constexpr const BYTE INT3 = 0xCC;
 	constexpr const BYTE NOP = 0x90;
 	constexpr const BYTE RET = 0xC3;
 
