@@ -1,3 +1,4 @@
+#pragma once
 #include<PE.h>
 #include<DbgContext.hpp>
 

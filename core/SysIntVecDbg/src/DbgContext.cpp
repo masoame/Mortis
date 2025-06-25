@@ -1,5 +1,5 @@
-#include<DbgContext.hpp>
 
+#include<DbgExecuter.hpp>
 using namespace Mortis;
 using namespace Mortis::SysIntVecDbg;
 
@@ -7,16 +7,19 @@ using namespace Mortis::SysIntVecDbg;
 ScopeHandle<> DebugContext::beforeException()
 {
 	auto pDbgExecutor = _dbgExecuter.lock();
+	if (!pDbgExecutor) {
+		return {};
+	}
 
 	if (WriteProcessMemory(pDbgExecutor->_th32ProcessID, lpfc, &code, sizeof(BYTE), 0) == FALSE) {
 		return false;
 	}
 
-	ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
-	CONTEXT ctx{};
-	ctx.ContextFlags = CONTEXT_CONTROL;
-	if (GetThreadContext(dbg_thr, &ctx) == FALSE)
-		return false;
+	//ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
+	//CONTEXT ctx{};
+	//ctx.ContextFlags = CONTEXT_CONTROL;
+	//if (GetThreadContext(dbg_thr, &ctx) == FALSE)
+	//	return false;
 }
 void DebugContext::afterException(ScopeHandle<> threadScopeHandle)
 {
