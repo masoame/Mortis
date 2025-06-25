@@ -7,15 +7,16 @@ namespace Mortis::SysIntVecDbg
 
 	class DebugKey {
 	public:
-		DWORD _nExceptionCode;
-		PVOID _fpExceptionAddress;
+		DWORD _dw_exception_code;
+		PVOID _fp_exception_address;
 		auto operator<=>(const DebugKey&) const = default;
 	};
 
 	class DebugContext : public DebugKey {
+		CONTEXT _ctx;
 	public:
-		BYTE _orginCode;
-		BYTE _intCode;
+		BYTE _origin_code;
+		BYTE _int_code;
 
 		std::function<void()> _callExceptionHandler;
 

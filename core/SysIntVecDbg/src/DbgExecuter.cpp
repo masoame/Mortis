@@ -13,23 +13,25 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 	if (DebugActiveProcess(_th32ProcessID) == FALSE) {
 		return;
 	}
-	ScopeExecutor closeExecutor([this] {
-		DebugActiveProcessStop(_th32ProcessID);
+	ScopeExecutor closeExecutor([_this = shared_from_this()] {
+		DebugActiveProcessStop(_this->_th32ProcessID);
 	});
 	DEBUG_EVENT _dbg_event;
 	DWORD dcstatus;
+	const auto& exception_record = _dbg_event.u.Exception.ExceptionRecord;
 
-	while (WaitForDebugEvent(&_dbg_event, INFINITE))
+	while (WaitForDebugEvent(&_dbg_event, INFINITE) && st.stop_requested())
 	{
 		dcstatus = DBG_CONTINUE;
 		if (_dbg_event.dwDebugEventCode == EXCEPTION_DEBUG_EVENT) {
-			const auto& exception_record = _dbg_event.u.Exception.ExceptionRecord;
+
 			DebugKey debugKey{
-				._nExceptionCode = exception_record.ExceptionCode,
-				._fpExceptionAddress = exception_record.ExceptionAddress
+				._dw_exception_code = exception_record.ExceptionCode,
+				._fp_exception_address = exception_record.ExceptionAddress
 			};
 
 			if (_dbg_contexts.contains(debugKey)) {
+				_dbg_contexts[debugKey].
 				_dbg_contexts[debugKey]._callExceptionHandler();
 			}
 		}
