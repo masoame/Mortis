@@ -24,6 +24,14 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 		dcstatus = DBG_CONTINUE;
 		if (_dbg_event.dwDebugEventCode == EXCEPTION_DEBUG_EVENT) {
 			const auto& exception_record = _dbg_event.u.Exception.ExceptionRecord;
+			DebugKey debugKey{
+				._nExceptionCode = exception_record.ExceptionCode,
+				._fpExceptionAddress = exception_record.ExceptionAddress
+			};
+
+			if (_dbg_contexts.contains(debugKey)) {
+				_dbg_contexts[debugKey]._callExceptionHandler();
+			}
 		}
 		else if (_dbg_event.dwDebugEventCode == CREATE_PROCESS_DEBUG_EVENT) {
 		
@@ -45,47 +53,47 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 	}
 	return;
 }
-bool DbgExecuter::DebugEventExector(const HANDLE hProcess, const DEBUG_EVENT& pde, const FARPROC lpfc, const BYTE& code, const std::function<void()>& OnHooked)
-{
-	//处理器的寄存器数据相关结构体
-	const auto& exception_record = pde.u.Exception.ExceptionRecord;
-
-	if (exception_record.ExceptionCode == EXCEPTION_BREAKPOINT) {
-		if (exception_record.ExceptionAddress == lpfc) {
-
-			if (WriteProcessMemory(hProcess, lpfc, &code, sizeof(BYTE), 0) == FALSE)
-				return false;
-
-			ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
-			CONTEXT ctx{};
-			ctx.ContextFlags = CONTEXT_CONTROL;
-			if (GetThreadContext(dbg_thr, &ctx) == FALSE)
-				return false;
-
-			OnHooked();
-
-#ifdef _WIN64
-			ctx.Rip = reinterpret_cast<DWORD64>(lpfc);
-#else
-			ctx.Eip = reinterpret_cast<DWORD32>(lpfc);
-#endif
-
-
-			if (SetThreadContext(dbg_thr, &ctx) == FALSE)
-				return false;
-
-			if (ContinueDebugEvent(pde.dwProcessId, pde.dwThreadId, DBG_CONTINUE) == FALSE)
-				return false;
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-			if (WriteProcessMemory(hProcess, (LPVOID)lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
-				return false;
-			return true;
-		}
-	}
-	return false;
-}
+//bool DbgExecuter::DebugEventExector(const HANDLE hProcess, const DEBUG_EVENT& pde, const FARPROC lpfc, const BYTE& code, const std::function<void()>& OnHooked)
+//{
+//	//处理器的寄存器数据相关结构体
+//	const auto& exception_record = pde.u.Exception.ExceptionRecord;
+//
+//	if (exception_record.ExceptionCode == EXCEPTION_BREAKPOINT) {
+//		if (exception_record.ExceptionAddress == lpfc) {
+//
+//			if (WriteProcessMemory(hProcess, lpfc, &code, sizeof(BYTE), 0) == FALSE)
+//				return false;
+//
+//			ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
+//			CONTEXT ctx{};
+//			ctx.ContextFlags = CONTEXT_CONTROL;
+//			if (GetThreadContext(dbg_thr, &ctx) == FALSE)
+//				return false;
+//
+//			OnHooked();
+//
+//#ifdef _WIN64
+//			ctx.Rip = reinterpret_cast<DWORD64>(lpfc);
+//#else
+//			ctx.Eip = reinterpret_cast<DWORD32>(lpfc);
+//#endif
+//
+//
+//			if (SetThreadContext(dbg_thr, &ctx) == FALSE)
+//				return false;
+//
+//			if (ContinueDebugEvent(pde.dwProcessId, pde.dwThreadId, DBG_CONTINUE) == FALSE)
+//				return false;
+//
+//			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+//
+//			if (WriteProcessMemory(hProcess, (LPVOID)lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
+//				return false;
+//			return true;
+//		}
+//	}
+//	return false;
+//}
 bool DbgExecuter::regDbgContext(std::string_view HookFunction, const std::function<void()>& OnHooked)
 {
 	HookFunction, OnHooked;
