@@ -23,6 +23,7 @@
 #include<string>
 #include<functional>
 #include<any>
+#include<future>
 
 #include<base_concept.hpp>
 #include<base_api.hpp>
@@ -31,6 +32,7 @@
 #include<ReflFunc.hpp>
 #include<ConvertString.hpp>
 #include<ScopeHandle.hpp>
+#include<ScopeWrapper.hpp>
 #include<bounded_queue.hpp>
 
 namespace os
