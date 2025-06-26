@@ -1,8 +1,8 @@
-#include<DbgExecuter.hpp>
+ï»¿#include<DbgExecuter.hpp>
 
 using namespace Mortis::SysIntVecDbg;
 
-DbgExecuter::DbgExecuter(DWORD th32ProcessID, HMODULE hModule): 
+DbgExecuter::DbgExecuter(DWORD th32ProcessID, HMODULE hModule) :
 	_th32ProcessID(th32ProcessID),
 	_hModule(hModule),
 	_dbg_thread(std::bind(&DbgExecuter::dbgThrTemplate, this,std::placeholders::_1))
@@ -16,7 +16,6 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 	ScopeExecutor closeExecutor([_this = shared_from_this()] {
 		DebugActiveProcessStop(_this->_th32ProcessID);
 	});
-	DEBUG_EVENT _dbg_event;
 	DWORD dcstatus;
 	const auto& exception_record = _dbg_event.u.Exception.ExceptionRecord;
 
@@ -29,9 +28,7 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 				._dw_exception_code = exception_record.ExceptionCode,
 				._fp_exception_address = exception_record.ExceptionAddress
 			};
-
 			if (_dbg_contexts.contains(debugKey)) {
-				_dbg_contexts[debugKey].
 				_dbg_contexts[debugKey]._callExceptionHandler();
 			}
 		}
@@ -57,7 +54,7 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 }
 //bool DbgExecuter::DebugEventExector(const HANDLE hProcess, const DEBUG_EVENT& pde, const FARPROC lpfc, const BYTE& code, const std::function<void()>& OnHooked)
 //{
-//	//´¦ÀíÆ÷µÄ¼Ä´æÆ÷Êı¾İÏà¹Ø½á¹¹Ìå
+//	//å¤„ç†å™¨çš„å¯„å­˜å™¨æ•°æ®ç›¸å…³ç»“æ„ä½“
 //	const auto& exception_record = pde.u.Exception.ExceptionRecord;
 //
 //	if (exception_record.ExceptionCode == EXCEPTION_BREAKPOINT) {

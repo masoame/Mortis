@@ -5,7 +5,7 @@ using namespace Mortis::PE;
 using namespace Mortis::SysIntVecDbg;
 
 
-ScopeHandle<> DebugContext::beforeException()
+ScopeHandle<> DebugContext::recoverAndGetThreadContext()
 {
 	auto pDbgExecutor = _dbgExecuter.lock();
 	if (!pDbgExecutor) {
@@ -15,24 +15,33 @@ ScopeHandle<> DebugContext::beforeException()
 	if (WriteProcessMemory(hProcess, _fp_exception_address, &_int_code, sizeof(BYTE), 0) == FALSE) {
 		return nullptr;
 	}
-
-	ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
-
+	ScopeHandle dbg_thr = OpenThreadHandle(pDbgExecutor->_dbg_event.dwThreadId);
 	_ctx.ContextFlags = CONTEXT_CONTROL;
 	if (GetThreadContext(dbg_thr, &_ctx) == FALSE) {
 		return nullptr;
 	}
+	return dbg_thr;
 }
-void DebugContext::afterException(ScopeHandle<> threadScopeHandle)
+bool DebugContext::resumeThreadAndDebug(ScopeHandle<>&& threadScopeHandle)
 {
-	//if (SetThreadContext(dbg_thr, &ctx) == FALSE)
-	//	return false;
+	auto pDbgExecutor = _dbgExecuter.lock();
+	if (!pDbgExecutor) {
+		return false;
+	}
+	const auto& dbg_event = pDbgExecutor->_dbg_event;
 
-	//if (ContinueDebugEvent(pde.dwProcessId, pde.dwThreadId, DBG_CONTINUE) == FALSE)
-	//	return false;
+	if (SetThreadContext(threadScopeHandle, &_ctx) == FALSE) {
+		return false;
+	}
+	if (ContinueDebugEvent(dbg_event.dwThreadId, dbg_event.dwThreadId, DBG_CONTINUE) == FALSE) {
+		return false;
+	}
 
-	//std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-	//if (WriteProcessMemory(hProcess, (LPVOID)lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
-	//	return false;
+	const auto hProcess = OpenProcessHandle(pDbgExecutor->_th32ProcessID);
+	if (WriteProcessMemory(hProcess, _fp_exception_address, &PE::INT3, sizeof(BYTE), NULL) == FALSE) {
+		return false;
+	}
+	return true;
 }

@@ -12,6 +12,9 @@ namespace Mortis::PE
 	auto OpenProcessHandle(const HasIdType& hasIdType, DWORD dwDesiredAccess = PROCESS_ALL_ACCESS, BOOL bInheritHandle = FALSE)
 		-> ScopeHandle<>;
 
+	auto OpenThreadHandle(DWORD dwThreadId,DWORD dwDesiredAccess = THREAD_ALL_ACCESS,BOOL bInheritHandle = FALSE)
+		-> ScopeHandle<>;
+
 	//搜索进程
 	template<typename ProcessNameType, typename UseWrapper = BT::SearchProcessWrapper<ProcessNameType>, typename PROCESSENTRY32Wrapper = UseWrapper::TYPE::PROCESSENTRY32Wrapper>
 		requires BC::SearchProcessConcept<ProcessNameType, PROCESSENTRY32Wrapper>
