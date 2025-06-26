@@ -10,8 +10,9 @@ namespace Mortis::PE
 	using HOOKWORD = DWORD64;
 #endif
 
-	enum INT_CODE {
-		//INT3 = 0xCC
+	enum IntCode {
+		//INT3 = 0xCC,
+		INT1 = 0xCD01,
 	};
 
 	constexpr const BYTE INT3 = 0xCC;
