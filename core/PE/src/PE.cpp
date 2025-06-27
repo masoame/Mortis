@@ -3,6 +3,11 @@
 
 namespace Mortis::PE {
 
+	auto OpenThreadHandle(DWORD dwThreadId, DWORD dwDesiredAccess, BOOL bInheritHandle)
+		-> ScopeHandle<> {
+		return OpenThread(dwDesiredAccess, bInheritHandle, dwThreadId);
+	}
+
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::unique_ptr<std::pair<IMAGE_DOS_HEADER, IMAGE_NT_HEADERS>>
 	{

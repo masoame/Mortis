@@ -64,7 +64,8 @@ namespace Mortis::SysIntVecDbg {
 		BYTE code = 0;
 		if (ReadProcessMemory(hProcess, lpfc, &code, sizeof(BYTE), NULL) == FALSE)
 			return std::nullopt;
-		if (WriteProcessMemory(hProcess, lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
+		auto int_code = PE::INT_TYPE::INT3;
+		if (WriteProcessMemory(hProcess, lpfc, &int_code, sizeof(BYTE), NULL) == FALSE)
 			return std::nullopt;
 
 		return { { lpfc , code } };
@@ -124,7 +125,8 @@ namespace Mortis::SysIntVecDbg {
 
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-				if (WriteProcessMemory(hProcess, (LPVOID)lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
+				auto _int_code = PE::INT_TYPE::INT3;
+				if (WriteProcessMemory(hProcess, (LPVOID)lpfc, &_int_code, sizeof(BYTE), NULL) == FALSE)
 					return false;
 				return true;
 			}
@@ -154,7 +156,8 @@ namespace Mortis::SysIntVecDbg {
 
 				if (ReadProcessMemory(pinfo.hProcess, lpfc, &code, sizeof(BYTE), NULL) == FALSE)
 					return false;
-				if (WriteProcessMemory(pinfo.hProcess, lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
+				auto int_code = PE::INT_TYPE::INT3;
+				if (WriteProcessMemory(pinfo.hProcess, lpfc, &int_code, sizeof(BYTE), NULL) == FALSE)
 					return false;
 			}
 			else if (de.dwDebugEventCode == EXCEPTION_DEBUG_EVENT) {

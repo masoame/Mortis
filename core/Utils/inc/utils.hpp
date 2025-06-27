@@ -24,6 +24,8 @@
 #include<functional>
 #include<any>
 #include<future>
+#include<spdlog/spdlog.h>
+#include<format>
 
 #include<base_concept.hpp>
 #include<base_api.hpp>

@@ -6,8 +6,8 @@ namespace Mortis::PE
 {
 	class HookExecutor
 	{
-		HookExecutor() {};
-		~HookExecutor() {};
+		HookExecutor();
+		~HookExecutor();
 	public:
 
 		HookExecutor* Instance() {

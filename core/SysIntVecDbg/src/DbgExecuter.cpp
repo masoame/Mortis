@@ -1,11 +1,10 @@
-#include<DbgExecuter.hpp>
+ï»¿#include<DbgExecuter.hpp>
 
 using namespace Mortis::SysIntVecDbg;
 
-DbgExecuter::DbgExecuter(DWORD th32ProcessID, HMODULE hModule): 
+DbgExecuter::DbgExecuter(DWORD th32ProcessID) :
 	_th32ProcessID(th32ProcessID),
-	_hModule(hModule),
-	_dbg_thread(std::bind(&DbgExecuter::dbgThrTemplate, this,std::placeholders::_1))
+	_dbg_thread(std::bind(&DbgExecuter::dbgThrTemplate, this, std::placeholders::_1))
 { }
 
 void DbgExecuter::dbgThrTemplate(std::stop_token st)
@@ -16,11 +15,10 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 	ScopeExecutor closeExecutor([_this = shared_from_this()] {
 		DebugActiveProcessStop(_this->_th32ProcessID);
 	});
-	DEBUG_EVENT _dbg_event;
 	DWORD dcstatus;
 	const auto& exception_record = _dbg_event.u.Exception.ExceptionRecord;
 
-	while (WaitForDebugEvent(&_dbg_event, INFINITE) && st.stop_requested())
+	while (WaitForDebugEvent(&_dbg_event, INFINITE) && (st.stop_requested() == false))
 	{
 		dcstatus = DBG_CONTINUE;
 		if (_dbg_event.dwDebugEventCode == EXCEPTION_DEBUG_EVENT) {
@@ -29,10 +27,16 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 				._dw_exception_code = exception_record.ExceptionCode,
 				._fp_exception_address = exception_record.ExceptionAddress
 			};
-
 			if (_dbg_contexts.contains(debugKey)) {
-				_dbg_contexts[debugKey].
-				_dbg_contexts[debugKey]._callExceptionHandler();
+
+				const auto& ctx = _dbg_contexts[debugKey];
+				auto hDbgThread = ctx->refreshThreadContext();
+				ScopeExecutor resumeThread{ [&ctx,hThread = std::move(hDbgThread)] mutable {
+					if (ctx->applyThreadContext(std::move(hThread)) == false){
+						spdlog::error(std::format("{}:{} error!!!",__FILE__,__LINE__));
+					}
+				}};
+				ctx->exceptionCallBack();
 			}
 		}
 		else if (_dbg_event.dwDebugEventCode == CREATE_PROCESS_DEBUG_EVENT) {
@@ -57,7 +61,7 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 }
 //bool DbgExecuter::DebugEventExector(const HANDLE hProcess, const DEBUG_EVENT& pde, const FARPROC lpfc, const BYTE& code, const std::function<void()>& OnHooked)
 //{
-//	//´¦ÀíÆ÷µÄ¼Ä´æÆ÷Êı¾İÏà¹Ø½á¹¹Ìå
+//	//å¤„ç†å™¨çš„å¯„å­˜å™¨æ•°æ®ç›¸å…³ç»“æ„ä½“
 //	const auto& exception_record = pde.u.Exception.ExceptionRecord;
 //
 //	if (exception_record.ExceptionCode == EXCEPTION_BREAKPOINT) {
@@ -96,8 +100,14 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 //	}
 //	return false;
 //}
-bool DbgExecuter::regDbgContext(std::string_view HookFunction, const std::function<void()>& OnHooked)
+bool DbgExecuter::regDbgContext(std::unique_ptr<DebugContext>&& dbgContext)
 {
-	HookFunction, OnHooked;
-	return true;
+	if (_dbg_contexts.contains(*dbgContext) == false && 
+			dbgContext->bindDbgExecuter(shared_from_this()) && 
+				dbgContext->startDebug()) {
+
+		_dbg_contexts.emplace(std::make_pair(*dbgContext,std::move(dbgContext)));
+		return true;
+	}
+	return false;
 }
