@@ -15,7 +15,6 @@ namespace Mortis::PE
 	template<typename FuncPtrType>
 	struct HookContext : public ReflFunc<FuncPtrType>
 	{
-		IntCode _int_code{};
 		std::set<MetaRelfOfFuncString> _meta_refl_of_func_strings{};
 
 		HookContext() = default;

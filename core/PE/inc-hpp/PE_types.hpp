@@ -10,14 +10,22 @@ namespace Mortis::PE
 	using HOOKWORD = DWORD64;
 #endif
 
-	enum IntCode {
-		//INT3 = 0xCC,
+	enum class INT_TYPE {
+		INT3 = 0xCC,
 		INT1 = 0xCD01,
 	};
 
-	constexpr const BYTE INT3 = 0xCC;
-	constexpr const BYTE NOP = 0x90;
-	constexpr const BYTE RET = 0xC3;
+	using INT_TYPE_LEN = std::size_t; 
+
+	inline std::map<INT_TYPE, INT_TYPE_LEN> INT_TABLE{
+		{ INT_TYPE::INT3 , 1 },
+		{ INT_TYPE::INT1 , 2 }
+	};
+
+
+	//constexpr const BYTE INT3 = 0xCC;
+	//constexpr const BYTE NOP = 0x90;
+	//constexpr const BYTE RET = 0xC3;
 
 	using Rva = DWORD;
 	using Ordinal = WORD;

@@ -1,14 +1,21 @@
-#include<DbgExecuter.hpp>
+ï»¿#include<DbgExecuter.hpp>
 
 using namespace Mortis::SysIntVecDbg;
 
-DbgExecuter::DbgExecuter(DWORD th32ProcessID, HMODULE hModule): 
+DbgExecuter::DbgExecuter(DWORD th32ProcessID) :
 	_th32ProcessID(th32ProcessID),
-	_hModule(hModule),
-	_dbg_thread(std::bind(&DbgExecuter::dbgThrTemplate, this,std::placeholders::_1))
+	_dbg_thread(std::bind(&DbgExecuter::dbgThrMain, this, std::placeholders::_1))
 { }
 
-void DbgExecuter::dbgThrTemplate(std::stop_token st)
+DbgExecuter::~DbgExecuter() {
+	_dbg_thread.request_stop();
+}
+
+void DbgExecuter::wait() {
+	_dbg_thread.join();
+}
+
+void DbgExecuter::dbgThrMain(std::stop_token st)
 {
 	if (DebugActiveProcess(_th32ProcessID) == FALSE) {
 		return;
@@ -16,23 +23,28 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 	ScopeExecutor closeExecutor([_this = shared_from_this()] {
 		DebugActiveProcessStop(_this->_th32ProcessID);
 	});
-	DEBUG_EVENT _dbg_event;
-	DWORD dcstatus;
 	const auto& exception_record = _dbg_event.u.Exception.ExceptionRecord;
 
-	while (WaitForDebugEvent(&_dbg_event, INFINITE) && st.stop_requested())
+	while (WaitForDebugEvent(&_dbg_event, INFINITE) && (st.stop_requested() == false))
 	{
-		dcstatus = DBG_CONTINUE;
 		if (_dbg_event.dwDebugEventCode == EXCEPTION_DEBUG_EVENT) {
 
 			DebugKey debugKey{
 				._dw_exception_code = exception_record.ExceptionCode,
 				._fp_exception_address = exception_record.ExceptionAddress
 			};
-
 			if (_dbg_contexts.contains(debugKey)) {
-				_dbg_contexts[debugKey].
-				_dbg_contexts[debugKey]._callExceptionHandler();
+
+				const auto& ctx = _dbg_contexts[debugKey];
+				auto hDbgThread = ctx->refreshThreadContext();
+				ScopeExecutor resumeThread{ [&ctx,hThread = std::move(hDbgThread)] mutable {
+					if (ctx->applyThreadContext(std::move(hThread)) == false){
+						spdlog::error(std::format("{}:{} error!!!",__FILE__,__LINE__));
+					}
+				}};
+				if (ctx->exceptionCallBack()) {
+					continue;
+				}
 			}
 		}
 		else if (_dbg_event.dwDebugEventCode == CREATE_PROCESS_DEBUG_EVENT) {
@@ -48,56 +60,21 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 
 		}
 
-		if (ContinueDebugEvent(_dbg_event.dwProcessId, _dbg_event.dwThreadId, dcstatus) == FALSE) {
+		if (ContinueDebugEvent(_dbg_event.dwProcessId, _dbg_event.dwThreadId, DBG_CONTINUE) == FALSE) {
 			return;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	return;
 }
-//bool DbgExecuter::DebugEventExector(const HANDLE hProcess, const DEBUG_EVENT& pde, const FARPROC lpfc, const BYTE& code, const std::function<void()>& OnHooked)
-//{
-//	//´¦ÀíÆ÷µÄ¼Ä´æÆ÷Êý¾ÝÏà¹Ø½á¹¹Ìå
-//	const auto& exception_record = pde.u.Exception.ExceptionRecord;
-//
-//	if (exception_record.ExceptionCode == EXCEPTION_BREAKPOINT) {
-//		if (exception_record.ExceptionAddress == lpfc) {
-//
-//			if (WriteProcessMemory(hProcess, lpfc, &code, sizeof(BYTE), 0) == FALSE)
-//				return false;
-//
-//			ScopeHandle dbg_thr = OpenThread(THREAD_ALL_ACCESS, FALSE, pde.dwThreadId);
-//			CONTEXT ctx{};
-//			ctx.ContextFlags = CONTEXT_CONTROL;
-//			if (GetThreadContext(dbg_thr, &ctx) == FALSE)
-//				return false;
-//
-//			OnHooked();
-//
-//#ifdef _WIN64
-//			ctx.Rip = reinterpret_cast<DWORD64>(lpfc);
-//#else
-//			ctx.Eip = reinterpret_cast<DWORD32>(lpfc);
-//#endif
-//
-//
-//			if (SetThreadContext(dbg_thr, &ctx) == FALSE)
-//				return false;
-//
-//			if (ContinueDebugEvent(pde.dwProcessId, pde.dwThreadId, DBG_CONTINUE) == FALSE)
-//				return false;
-//
-//			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-//
-//			if (WriteProcessMemory(hProcess, (LPVOID)lpfc, &PE::INT3, sizeof(BYTE), NULL) == FALSE)
-//				return false;
-//			return true;
-//		}
-//	}
-//	return false;
-//}
-bool DbgExecuter::regDbgContext(std::string_view HookFunction, const std::function<void()>& OnHooked)
+bool DbgExecuter::regDbgContext(std::unique_ptr<DebugContext>&& dbgContext)
 {
-	HookFunction, OnHooked;
-	return true;
+	if (_dbg_contexts.contains(*dbgContext) == false && 
+			dbgContext->bindDbgExecuter(shared_from_this()) && 
+				dbgContext->startDebug()) {
+
+		_dbg_contexts.emplace(std::make_pair(*dbgContext,std::move(dbgContext)));
+		return true;
+	}
+	return false;
 }

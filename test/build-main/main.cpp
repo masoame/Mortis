@@ -1,5 +1,6 @@
 #include "Hook.hpp"
 #include<HookContext.h>
+#include<DbgExecuter.hpp>
 #include <iostream>
 
 using namespace Mortis;
@@ -16,49 +17,47 @@ class C {
 
 };
 
-void test(A a,A b,A c,B d,C e) {
-	a, b, c, d, e;
-}
+
 void test1(const char* a, const wchar_t* b, const char8_t* c) {
 	a, b, c;
 }
 
+using namespace std::chrono_literals;
 int main()
 {
 	system("chcp 65001");
 
-	auto type_map1 = HookContext(test).refl_args_positions_map<A,B,C>();
-	for (auto const& [key, val] : type_map1) {
-		std::cout << key << ": ";
-		for (auto const& pos : val) {
-			std::cout << pos << " ";
-		}
-		std::cout << std::endl;
-	}
-
-	auto process = SearchProcess(L"notepad.exe");
-	if (process == nullptr) {
+	auto process_entry = SearchProcess(L"Notepad.exe");
+	if (process_entry == nullptr) {
 		std::cout << "Process not found" << std::endl;
 		return -1;
 	}
-	std::cout << "Process found: " << process->th32ProcessID << std::endl;
-	auto _module = SearchModule(process->th32ProcessID, L"kernel32.dll");
+	std::cout << "Process found: " << process_entry->th32ProcessID << std::endl;
+	auto _module = SearchModule(process_entry->th32ProcessID, L"kernel32.dll");
 	if (_module == nullptr) {
 		std::cout << "Module not found" << std::endl;
 		return -1;
 	}
 	std::wcout << L"Module found: " << _module->szModule << std::endl;
 
-	const auto hProcess = OpenProcessHandle(process);
+	const auto hProcess = OpenProcessHandle(process_entry);
 	const auto pWriteFile = Exp::GetProcAddressEx(hProcess, _module->hModule, "WriteFile");
 	std::cout << pWriteFile << std::endl;
 
-	auto pfn = HookPrc(process->th32ProcessID, _module->hModule, "WriteFile", []{
-		static int count = 0;
-		std::cout << "WriteFile called " << count++ << std::endl;
-	});
+	auto dbgContext = std::make_unique<DebugContext>();
+	dbgContext->_fp_exception_address = pWriteFile;
+	dbgContext->_dw_exception_code = EXCEPTION_BREAKPOINT;
+	dbgContext->_int_code = INT_TYPE::INT3;
+
+	auto dbgExecutor = std::make_shared<DbgExecuter>(process_entry->th32ProcessID);
+	dbgExecutor->regDbgContext(std::move(dbgContext));
+
+	//auto pfn = HookPrc(process->th32ProcessID, _module->hModule, "WriteFile", []{
+	//	static int count = 0;
+	//	std::cout << "WriteFile called " << count++ << std::endl;
+	//});
 
 
-	system("pause");
-	return pfn;
+	dbgExecutor->wait();
+	return true;
 }
