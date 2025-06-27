@@ -22,7 +22,7 @@ namespace Mortis::SysIntVecDbg
 
 		bool getThreadContext(const ScopeHandle<>& hThread,DWORD contextFlags = CONTEXT_ALL);
 		bool setThreadContext(const ScopeHandle<>& hThread) const;
-		void recoverRegisterIP();
+		void recoverRegisterIP() noexcept;
 
 
 		auto recoverAndGetThreadContext() 

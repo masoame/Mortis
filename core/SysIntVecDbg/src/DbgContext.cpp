@@ -20,7 +20,7 @@ bool DebugContext::setThreadContext(const ScopeHandle<>& hThread) const
 	return true;
 }
 
-void DebugContext::recoverRegisterIP() {
+void DebugContext::recoverRegisterIP() noexcept {
 #ifdef _WIN64
 	_ctx.Rip = reinterpret_cast<DWORD64>(_fp_exception_address);
 #else
@@ -48,6 +48,7 @@ auto DebugContext::recoverAndGetThreadContext()
 bool DebugContext::resumeThreadAndDebug(ScopeHandle<>&& threadScopeHandle)
 {
 	recoverRegisterIP();
+
 	auto pDbgExecutor = _dbgExecuter.lock();
 	if (!pDbgExecutor) {
 		return false;
@@ -57,7 +58,7 @@ bool DebugContext::resumeThreadAndDebug(ScopeHandle<>&& threadScopeHandle)
 	if (getThreadContext(threadScopeHandle) == false) {
 		return false;
 	}
-	if (ContinueDebugEvent(dbg_event.dwThreadId, dbg_event.dwThreadId, DBG_CONTINUE) == FALSE) {
+	if (ContinueDebugEvent(dbg_event.dwProcessId, dbg_event.dwThreadId, DBG_CONTINUE) == FALSE) {
 		return false;
 	}
 
