@@ -80,6 +80,11 @@ namespace Mortis
 		}
 	};
 
+	template<typename HandleType, typename DeleteFunc,typename... Args>
+	auto MakeScopeHandle(Args&& ... agrs){
+		return  ScopeHandle<HandleType, DeleteFunc>(new HandleType(std::forward<Args>(agrs)...));
+	}
+
 	template<class HandleType = HANDLE, class DeleteFunc = BT::StaticFunctorWrapper<CloseHandle>>
 	class ScopeHandle;
 

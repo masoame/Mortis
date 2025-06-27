@@ -1,5 +1,6 @@
 #include "Hook.hpp"
 #include<HookContext.h>
+#include<DbgExecuter.hpp>
 #include <iostream>
 
 using namespace Mortis;
@@ -16,25 +17,37 @@ class C {
 
 };
 
-void test(A a,A b,A c,B d,C e) {
-	a, b, c, d, e;
-}
+
 void test1(const char* a, const wchar_t* b, const char8_t* c) {
 	a, b, c;
 }
 
+//#define TESTFUNCK \
+//for (auto const& [key, val] : type_map1) {\
+//	std::cout << key << ": ";\
+//	for (auto const& pos : val) {\
+//		std::cout << pos << " ";\
+//	}\
+//	std::cout << std::endl;\
+//}
+
+void test(A a, A b, A c, B d, C e) {
+	a, b, c, d, e;
+}
 int main()
 {
 	system("chcp 65001");
 
-	auto type_map1 = HookContext(test).refl_args_positions_map<A,B,C>();
-	for (auto const& [key, val] : type_map1) {
-		std::cout << key << ": ";
-		for (auto const& pos : val) {
-			std::cout << pos << " ";
-		}
-		std::cout << std::endl;
-	}
+	//auto type_map1 = HookContext(test).refl_args_positions_map<A,B,C>();
+
+	//for (auto const& [key, val] : type_map1) {
+	//	std::cout << key << ": ";
+	//	for (auto const& pos : val) {
+	//		std::cout << pos << " ";
+	//	}
+	//	std::cout << std::endl;
+	//}
+	//TESTFUNCK;
 
 	auto process = SearchProcess(L"notepad.exe");
 	if (process == nullptr) {
@@ -53,12 +66,17 @@ int main()
 	const auto pWriteFile = Exp::GetProcAddressEx(hProcess, _module->hModule, "WriteFile");
 	std::cout << pWriteFile << std::endl;
 
+	//auto a = MakeScopeHandle<DebugContext>();
+
+	DbgExecuter dbgExecutor{ hProcess };
+	dbgExecutor.regDbgContext{ dbgContext };
+
 	auto pfn = HookPrc(process->th32ProcessID, _module->hModule, "WriteFile", []{
 		static int count = 0;
 		std::cout << "WriteFile called " << count++ << std::endl;
 	});
 
 
-	system("pause");
-	return pfn;
+	//system("pause");
+	return 0;
 }

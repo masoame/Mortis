@@ -7,8 +7,9 @@ namespace Mortis::SysIntVecDbg
 
 	class DebugKey {
 	public:
-		DWORD _dw_exception_code;
+		DWORD _dw_exception_code = EXCEPTION_BREAKPOINT;
 		PVOID _fp_exception_address;
+		DebugKey() noexcept = default;
 		auto operator<=>(const DebugKey&) const = default;
 	};
 
@@ -22,8 +23,7 @@ namespace Mortis::SysIntVecDbg
 
 		bool getThreadContext(const ScopeHandle<>& hThread,DWORD contextFlags = CONTEXT_ALL);
 		bool setThreadContext(const ScopeHandle<>& hThread) const;
-		void recoverRegisterIP();
-
+		void recoverRegisterIP() noexcept;
 
 		auto recoverAndGetThreadContext() 
 			-> ScopeHandle<>;

@@ -2,9 +2,8 @@
 
 using namespace Mortis::SysIntVecDbg;
 
-DbgExecuter::DbgExecuter(DWORD th32ProcessID, HMODULE hModule) :
+DbgExecuter::DbgExecuter(DWORD th32ProcessID) :
 	_th32ProcessID(th32ProcessID),
-	_hModule(hModule),
 	_dbg_thread(std::bind(&DbgExecuter::dbgThrTemplate, this,std::placeholders::_1))
 { }
 
@@ -33,7 +32,9 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 				auto& ctx = _dbg_contexts[debugKey];
 				auto hThread = ctx.recoverAndGetThreadContext();
 				ScopeExecutor resumeThread{ [&ctx,&hThread] {
-					ctx.resumeThreadAndDebug(std::move(hThread));
+					if (ctx.resumeThreadAndDebug(std::move(hThread)) == false){
+						spdlog::error(std::format("{}:{} error!!!",__FILE__,__LINE__));
+					}
 				}};
 				ctx._callExceptionHandler();
 			}
@@ -99,8 +100,11 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 //	}
 //	return false;
 //}
-bool DbgExecuter::regDbgContext(std::string_view HookFunction, const std::function<void()>& OnHooked)
+bool DbgExecuter::regDbgContext(ScopeHandle<DebugContext>&& debugContext)
 {
-	HookFunction, OnHooked;
-	return true;
+	if (_dbg_contexts.contains(*debugContext) == false) {
+		_dbg_contexts.emplace(std::move(debugContext));
+		return true;
+	}
+	return false;
 }
