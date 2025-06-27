@@ -78,12 +78,17 @@ namespace Mortis
 		Ptr get() const noexcept {
 			return _ptr.get();
 		}
+
+		template<typename ...Args>
+		static ScopeHandle<HandleType, DeleteFunc> New(Args&& ... agrs) {
+			return  ScopeHandle<HandleType, DeleteFunc>(new HandleType(std::forward<Args>(agrs)...));
+		}
 	};
 
-	template<typename HandleType, typename DeleteFunc,typename... Args>
-	auto MakeScopeHandle(Args&& ... agrs){
-		return  ScopeHandle<HandleType, DeleteFunc>(new HandleType(std::forward<Args>(agrs)...));
-	}
+	template<typename HandleType>
+	class ScopeHandle<HandleType, void> : public std::unique_ptr<HandleType> {
+
+	};
 
 	template<class HandleType = HANDLE, class DeleteFunc = BT::StaticFunctorWrapper<CloseHandle>>
 	class ScopeHandle;

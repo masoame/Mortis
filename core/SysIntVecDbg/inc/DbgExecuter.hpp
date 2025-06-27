@@ -8,7 +8,7 @@ namespace Mortis::SysIntVecDbg
 		friend class DebugContext;
 
 		std::jthread _dbg_thread;
-		std::map<DebugKey, ScopeHandle<DebugContext>> _dbg_contexts;
+		std::map<DebugKey, std::unique_ptr<DebugContext>> _dbg_contexts;
 
 		DEBUG_EVENT _dbg_event;
 	protected:
@@ -18,7 +18,7 @@ namespace Mortis::SysIntVecDbg
 		BOOL DebugEventExector();
 	public:
 
-		bool regDbgContext(ScopeHandle<DebugContext>&& debugContext);
+		bool regDbgContext(std::unique_ptr<DebugContext>&& debugContext);
 		DbgExecuter(DWORD th32ProcessID);
 		~DbgExecuter() {
 			_dbg_thread.request_stop();

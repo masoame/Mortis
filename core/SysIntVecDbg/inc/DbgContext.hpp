@@ -25,6 +25,7 @@ namespace Mortis::SysIntVecDbg
 		bool setThreadContext(const ScopeHandle<>& hThread) const;
 		void recoverRegisterIP() noexcept;
 
+
 		auto recoverAndGetThreadContext() 
 			-> ScopeHandle<>;
 		bool resumeThreadAndDebug(ScopeHandle<>&& threadHandle);

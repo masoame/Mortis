@@ -30,13 +30,13 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 			if (_dbg_contexts.contains(debugKey)) {
 
 				auto& ctx = _dbg_contexts[debugKey];
-				auto hThread = ctx.recoverAndGetThreadContext();
+				auto hThread = ctx->recoverAndGetThreadContext();
 				ScopeExecutor resumeThread{ [&ctx,&hThread] {
-					if (ctx.resumeThreadAndDebug(std::move(hThread)) == false){
+					if (ctx->resumeThreadAndDebug(std::move(hThread)) == false){
 						spdlog::error(std::format("{}:{} error!!!",__FILE__,__LINE__));
 					}
 				}};
-				ctx._callExceptionHandler();
+				ctx->_callExceptionHandler();
 			}
 		}
 		else if (_dbg_event.dwDebugEventCode == CREATE_PROCESS_DEBUG_EVENT) {
@@ -100,7 +100,7 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 //	}
 //	return false;
 //}
-bool DbgExecuter::regDbgContext(ScopeHandle<DebugContext>&& debugContext)
+bool DbgExecuter::regDbgContext(std::unique_ptr<DebugContext>&& debugContext)
 {
 	if (_dbg_contexts.contains(*debugContext) == false) {
 		_dbg_contexts.emplace(std::move(debugContext));

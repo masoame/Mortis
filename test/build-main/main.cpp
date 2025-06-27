@@ -66,10 +66,9 @@ int main()
 	const auto pWriteFile = Exp::GetProcAddressEx(hProcess, _module->hModule, "WriteFile");
 	std::cout << pWriteFile << std::endl;
 
-	//auto a = MakeScopeHandle<DebugContext>();
-
+	auto dbgContext = std::make_unique<DebugContext>();
 	DbgExecuter dbgExecutor{ hProcess };
-	dbgExecutor.regDbgContext{ dbgContext };
+	dbgExecutor.regDbgContext(std::move(dbgContext));
 
 	auto pfn = HookPrc(process->th32ProcessID, _module->hModule, "WriteFile", []{
 		static int count = 0;
