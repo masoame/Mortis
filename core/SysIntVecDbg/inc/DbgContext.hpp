@@ -14,15 +14,19 @@ namespace Mortis::SysIntVecDbg
 
 	class DebugContext : public DebugKey {
 		CONTEXT _ctx;
-	public:
 		BYTE _origin_code;
 		BYTE _int_code;
-
+		std::weak_ptr<DbgExecuter> _dbgExecuter;
+	public:
 		std::function<void()> _callExceptionHandler;
 
-		std::weak_ptr<DbgExecuter> _dbgExecuter;
+		bool getThreadContext(const ScopeHandle<>& hThread,DWORD contextFlags = CONTEXT_ALL);
+		bool setThreadContext(const ScopeHandle<>& hThread) const;
+		void recoverRegisterIP();
 
-		ScopeHandle<> recoverAndGetThreadContext();
+
+		auto recoverAndGetThreadContext() 
+			-> ScopeHandle<>;
 		bool resumeThreadAndDebug(ScopeHandle<>&& threadHandle);
 	};
 }

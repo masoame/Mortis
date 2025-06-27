@@ -29,7 +29,13 @@ void DbgExecuter::dbgThrTemplate(std::stop_token st)
 				._fp_exception_address = exception_record.ExceptionAddress
 			};
 			if (_dbg_contexts.contains(debugKey)) {
-				_dbg_contexts[debugKey]._callExceptionHandler();
+
+				auto& ctx = _dbg_contexts[debugKey];
+				auto hThread = ctx.recoverAndGetThreadContext();
+				ScopeExecutor resumeThread{ [&ctx,&hThread] {
+					ctx.resumeThreadAndDebug(std::move(hThread));
+				}};
+				ctx._callExceptionHandler();
 			}
 		}
 		else if (_dbg_event.dwDebugEventCode == CREATE_PROCESS_DEBUG_EVENT) {
