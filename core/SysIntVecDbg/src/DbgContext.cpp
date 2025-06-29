@@ -71,11 +71,19 @@ bool DebugContext::setIntCode(INT_TYPE int_code) noexcept {
 	return false;
 }
 
+void DebugContext::regExceptionCallBack(std::function<void()> callBackFunc)
+{
+	_callExceptionHandler = std::bind(callBackFunc);
+}
 
-bool DebugContext::exceptionCallBack() {
-	//测试
-	static std::size_t count = 1;
-	spdlog::info("{} : {}", _fp_exception_address ,++count);
+bool DebugContext::exceptionCallBack() const 
+{
+	try {
+		_callExceptionHandler();
+	}
+	catch (...) {
+		return false;
+	}
 	return true;
 }
 

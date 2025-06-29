@@ -37,11 +37,11 @@ void DbgExecuter::dbgThrMain(std::stop_token st)
 
 				const auto& ctx = _dbg_contexts[debugKey];
 				auto hDbgThread = ctx->refreshThreadContext();
-				ScopeExecutor resumeThread{ [&ctx,hThread = std::move(hDbgThread)] mutable {
-					if (ctx->applyThreadContext(std::move(hThread)) == false){
-						spdlog::error(std::format("{}:{} error!!!",__FILE__,__LINE__));
-					}
-				}};
+                ScopeExecutor resumeThread{ [&ctx, hThread = std::move(hDbgThread)]() mutable {
+                   if (ctx->applyThreadContext(std::move(hThread)) == false) {
+                       spdlog::error(std::format("{}:{} error!!!", __FILE__, __LINE__));
+                   }
+                } };
 				if (ctx->exceptionCallBack()) {
 					continue;
 				}

@@ -13,12 +13,12 @@ namespace Mortis::PE
 
 
 	template<typename FuncPtrType>
-	struct HookContext : public ReflFunc<FuncPtrType>
+	struct ReflFuncResult : public ReflFunc<FuncPtrType>
 	{
 		std::set<MetaRelfOfFuncString> _meta_refl_of_func_strings{};
 
-		HookContext() = default;
-		HookContext(FuncPtrType func_ptr) : 
+		ReflFuncResult() = default;
+		ReflFuncResult(FuncPtrType func_ptr) : 
 			ReflFunc<FuncPtrType>(func_ptr) {
 
 		}

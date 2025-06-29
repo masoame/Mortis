@@ -22,11 +22,6 @@ namespace Mortis::PE
 		{ INT_TYPE::INT1 , 2 }
 	};
 
-
-	//constexpr const BYTE INT3 = 0xCC;
-	//constexpr const BYTE NOP = 0x90;
-	//constexpr const BYTE RET = 0xC3;
-
 	using Rva = DWORD;
 	using Ordinal = WORD;
 	using Hint = WORD;

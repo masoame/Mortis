@@ -20,10 +20,10 @@ namespace Mortis::SysIntVecDbg
 		CONTEXT _ctx;
 		std::weak_ptr<DbgExecuter> _dbgExecuter;
 	protected:
+
+		
+
 		BYTE _origin_code;
-
-
-
 		std::function<void()> _callExceptionHandler;
 
 		bool continueDebug(const ScopeHandle<>& hProcess) const noexcept;
@@ -40,11 +40,11 @@ namespace Mortis::SysIntVecDbg
 		bool bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept;
 		bool startDebug() noexcept;
 
-
 		auto refreshThreadContext() 
 			-> ScopeHandle<>;
 		bool applyThreadContext(ScopeHandle<>&& threadHandle);
 
-		bool exceptionCallBack();
+		void regExceptionCallBack(std::function<void()>  callBackFunc);
+		bool exceptionCallBack() const;
 	};
 }
