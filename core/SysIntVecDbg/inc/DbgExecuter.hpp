@@ -4,7 +4,15 @@
 
 namespace Mortis::SysIntVecDbg
 {
-	class DbgExecuter : public std::enable_shared_from_this<DbgExecuter> {
+	class DbgReflStore
+	{
+		DWORD _th32ProcessID;
+		DbgReflStore(DWORD th32ProcessID);
+	};
+
+
+	class DbgExecuter : public std::enable_shared_from_this<DbgExecuter> 
+	{
 		friend struct DebugContext;
 		DEBUG_EVENT _dbg_event;
 

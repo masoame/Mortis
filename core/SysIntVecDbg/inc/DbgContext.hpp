@@ -10,7 +10,6 @@ namespace Mortis::SysIntVecDbg
 		DWORD _dw_exception_code;
 		PVOID _fp_exception_address;
 
-		//DebugKey() noexcept = default;
 		auto operator<=>(const DebugKey&) const = default;
 	};
 
@@ -19,17 +18,20 @@ namespace Mortis::SysIntVecDbg
 		PE::INT_TYPE _int_code;
 	private:
 		CONTEXT _ctx;
-		std::weak_ptr<DbgExecuter> _dbgExecuter;
+		std::weak_ptr<DbgExecuter> _dbg_executer;
 	protected:
 		BYTE _origin_code;
-		std::function<void()> _callExceptionHandler;
+		std::function<void()> _call_exception_handler;
 
 		bool continueDebug(const ScopeHandle<>& hProcess) const noexcept;
-		bool stopDebug(const ScopeHandle<>& hProcess)const noexcept;
+		bool stopDebug(const ScopeHandle<>& hProcess) const noexcept;
 
 		bool saveOrginCode(const ScopeHandle<>& hProcess)noexcept;
 		bool setIntCode(PE::INT_TYPE int_code) noexcept;
 	public:
+		DebugContext(PVOID fp_exception_address, DWORD _dw_exception_code = EXCEPTION_BREAKPOINT, PE::INT_TYPE _int_code = PE::INT_TYPE::INT3);
+		DebugContext() = default;
+
 		bool getThreadContext(const ScopeHandle<>& hThread,DWORD contextFlags = CONTEXT_ALL);
 		bool setThreadContext(const ScopeHandle<>& hThread) const;
 
@@ -42,7 +44,7 @@ namespace Mortis::SysIntVecDbg
 			-> ScopeHandle<>;
 		bool applyThreadContext(ScopeHandle<>&& threadHandle);
 
-		void regExceptionCallBack(std::function<void()>  callBackFunc);
+		void regExceptionCallBack(std::function<void(DebugContext& )> callBackFunc);
 		bool exceptionCallBack() const;
 	};
 }

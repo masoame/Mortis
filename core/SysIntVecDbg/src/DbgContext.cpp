@@ -4,6 +4,14 @@ using namespace Mortis;
 using namespace Mortis::PE;
 using namespace Mortis::SysIntVecDbg;
 
+
+DebugContext::DebugContext(PVOID fp_exception_address, DWORD dw_exception_code, PE::INT_TYPE int_code)
+{
+	_fp_exception_address = fp_exception_address;
+	_dw_exception_code = dw_exception_code;
+	_int_code = int_code;
+}
+
 bool DebugContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
 {
 	_ctx.ContextFlags = contextFlags;
@@ -29,14 +37,14 @@ void DebugContext::recoverRegisterRIP() noexcept {
 }
 
 bool DebugContext::bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept {
-	if (_dbgExecuter.expired()) {
-		_dbgExecuter = pDbgExecuter->weak_from_this();
+	if (_dbg_executer.expired()) {
+		_dbg_executer = pDbgExecuter->weak_from_this();
 		return true;
 	}
 	return false;
 }
 bool DebugContext::startDebug() noexcept {
-	auto pDbgExecutor = _dbgExecuter.lock();
+	auto pDbgExecutor = _dbg_executer.lock();
 	if (!pDbgExecutor) {
 		return false;
 	}
@@ -72,15 +80,15 @@ bool DebugContext::setIntCode(INT_TYPE int_code) noexcept {
 	return false;
 }
 
-void DebugContext::regExceptionCallBack(std::function<void()> callBackFunc)
+void DebugContext::regExceptionCallBack(std::function<void(DebugContext& )> callBackFunc)
 {
-	_callExceptionHandler = std::bind(callBackFunc);
+	_call_exception_handler = std::bind(callBackFunc,std::ref(*this));
 }
 
 bool DebugContext::exceptionCallBack() const 
 {
 	try {
-		_callExceptionHandler();
+		_call_exception_handler();
 	}
 	catch (...) {
 		return false;
@@ -92,7 +100,7 @@ bool DebugContext::exceptionCallBack() const
 auto DebugContext::refreshThreadContext()
 	->ScopeHandle<>
 {
-	auto pDbgExecutor = _dbgExecuter.lock();
+	auto pDbgExecutor = _dbg_executer.lock();
 	if (!pDbgExecutor) {
 		return nullptr;
 	}
@@ -111,7 +119,7 @@ bool DebugContext::applyThreadContext(ScopeHandle<>&& threadScopeHandle)
 {
 	recoverRegisterRIP();
 
-	auto pDbgExecutor = _dbgExecuter.lock();
+	auto pDbgExecutor = _dbg_executer.lock();
 	if (pDbgExecutor == nullptr) {
 		return false;
 	}

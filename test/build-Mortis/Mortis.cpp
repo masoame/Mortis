@@ -18,12 +18,11 @@ int main()
 		return -1;
 	}
 
-	auto dbgContext = std::make_unique<DebugContext>();
-	dbgContext->_fp_exception_address = WriteFile;
-	dbgContext->_dw_exception_code = EXCEPTION_BREAKPOINT;
-	dbgContext->_int_code = INT_TYPE::INT3;
+	auto dbgContext = std::make_unique<DebugContext>(&WriteFile);
+
 	dbgContext->regExceptionCallBack(
-		[&dbgContext]() {
+		[](const DebugContext & ctx) {
+			
 			static int count = 0;
 			spdlog::info("count: {}", ++count);
 		}

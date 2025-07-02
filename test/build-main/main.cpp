@@ -23,7 +23,7 @@ int main()
 	dbgContext->_dw_exception_code = EXCEPTION_BREAKPOINT;
 	dbgContext->_int_code = INT_TYPE::INT3;
 	dbgContext->regExceptionCallBack(
-		[&dbgContext]() {
+		[](DebugContext& ) {
 			static int count = 0;
 			spdlog::info("count: {}", ++count);
 		}
