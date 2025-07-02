@@ -19,7 +19,7 @@ namespace Mortis
 	struct ScopeHandleWrapper;
 
 	template<class HandleType, class DeleteFunc>
-	class ScopeHandle : public ScopeHandleWrapper<HandleType, DeleteFunc>
+	class ScopeHandle
 	{
 		using unique_ptr = ScopeHandleWrapper<HandleType, DeleteFunc>::unique_ptr;
 		using Ptr = ScopeHandleWrapper<HandleType, DeleteFunc>::Ptr;
@@ -83,11 +83,6 @@ namespace Mortis
 		static ScopeHandle<HandleType, DeleteFunc> New(Args&& ... agrs) {
 			return  ScopeHandle<HandleType, DeleteFunc>(new HandleType(std::forward<Args>(agrs)...));
 		}
-	};
-
-	template<typename HandleType>
-	class ScopeHandle<HandleType, void> : public std::unique_ptr<HandleType> {
-
 	};
 
 	template<class HandleType = HANDLE, class DeleteFunc = BT::StaticFunctorWrapper<CloseHandle>>
