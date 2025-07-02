@@ -19,7 +19,6 @@ namespace Mortis::PE
 	class ContextView
 	{
 	private:
-		//ReflFuncResult<void()> _reflFuncResult;
 		const CONTEXT& _context;
 	public:
 		ContextView(const CONTEXT& context) : _context(context) {}

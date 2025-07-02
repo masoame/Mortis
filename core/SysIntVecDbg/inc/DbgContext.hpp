@@ -14,15 +14,13 @@ namespace Mortis::SysIntVecDbg
 		auto operator<=>(const DebugKey&) const = default;
 	};
 
-	struct DebugContext : public DebugKey {
+	struct DebugContext : public DebugKey 
+	{
 		PE::INT_TYPE _int_code;
 	private:
 		CONTEXT _ctx;
 		std::weak_ptr<DbgExecuter> _dbgExecuter;
 	protected:
-
-		
-
 		BYTE _origin_code;
 		std::function<void()> _callExceptionHandler;
 

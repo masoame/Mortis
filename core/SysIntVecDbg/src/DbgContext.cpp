@@ -65,9 +65,10 @@ bool DebugContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
 }
 
 bool DebugContext::setIntCode(INT_TYPE int_code) noexcept {
-	if (INT_TABLE.contains(int_code)) {
+	//if (INT_TABLE.contains(int_code)) {
 
-	}
+	//}
+	int_code;
 	return false;
 }
 

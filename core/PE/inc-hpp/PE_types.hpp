@@ -15,12 +15,12 @@ namespace Mortis::PE
 		INT1 = 0xCD01,
 	};
 
-	using INT_TYPE_LEN = std::size_t; 
+	//using INT_TYPE_LEN = unsigned char; 
 
-	inline std::map<INT_TYPE, INT_TYPE_LEN> INT_TABLE{
-		{ INT_TYPE::INT3 , 1 },
-		{ INT_TYPE::INT1 , 2 }
-	};
+	//inline std::map<INT_TYPE, INT_TYPE_LEN> INT_TABLE{
+	//	{ INT_TYPE::INT3 , 1 },
+	//	{ INT_TYPE::INT1 , 2 }
+	//};
 
 	using Rva = DWORD;
 	using Ordinal = WORD;
