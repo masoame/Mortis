@@ -3,6 +3,13 @@
 
 namespace Mortis::PE::Exp
 {
+	struct ExportTable
+	{
+		Ordinal _ordinal;
+		Rva _rva;
+		std::string _func_name;
+	};
+
 	//获得导出表目录
 	auto GetDirectory(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::unique_ptr<IMAGE_EXPORT_DIRECTORY>;
@@ -11,7 +18,7 @@ namespace Mortis::PE::Exp
 	auto GetNameOfRVAGroup(HANDLE ProcessHandle, HMODULE BaseAddress, const std::unique_ptr<IMAGE_EXPORT_DIRECTORY>& ExpDir = nullptr)
 		-> std::vector<Rva>;
 
-	//获得导入表
+	//获得导出表
 	auto GetTable(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::vector<std::tuple<Ordinal, Rva, std::string>>;
 

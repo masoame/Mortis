@@ -2,6 +2,14 @@
 
 namespace Mortis::PE::Imp
 {
+	struct ImportTable{
+		Ordinal _ordianls;
+		Hint _hint;
+		std::string _func_name;
+		FuncPtr _func_ptr;
+	};
+
+
 	auto GetDescriptorGroup(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::vector<IMAGE_IMPORT_DESCRIPTOR>;
 
