@@ -3,6 +3,7 @@
 using namespace Mortis::SysIntVecDbg;
 
 DbgExecuter::DbgExecuter(DWORD th32ProcessID) :
+	_thread_ctx(new CONTEXT{}),
 	_th32ProcessID(th32ProcessID),
 	_dbg_thread(std::bind(&DbgExecuter::dbgThrMain, this, std::placeholders::_1))
 { }

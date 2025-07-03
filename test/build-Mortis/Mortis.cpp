@@ -12,7 +12,7 @@ int main()
 {
 	system("chcp 65001");
 
-	auto process_entry = SearchProcess(L"notepad.exe");
+	auto process_entry = SearchProcess(L"Notepad.exe");
 	if (process_entry == nullptr) {
 		std::cout << "Process not found" << std::endl;
 		return -1;
