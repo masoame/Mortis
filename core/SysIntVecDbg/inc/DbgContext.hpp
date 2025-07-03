@@ -17,8 +17,8 @@ namespace Mortis::SysIntVecDbg
 	{
 		PE::INT_TYPE _int_code;
 	private:
-		CONTEXT _ctx;
-		std::weak_ptr<DbgExecuter> _dbg_executer;
+		std::weak_ptr<DbgExecuter> _dbg_executer{};
+		std::weak_ptr<CONTEXT> _thread_ctx{};
 	protected:
 		BYTE _origin_code;
 		std::function<void()> _call_exception_handler;

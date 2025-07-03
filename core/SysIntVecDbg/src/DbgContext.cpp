@@ -14,31 +14,35 @@ DebugContext::DebugContext(PVOID fp_exception_address, DWORD dw_exception_code, 
 
 bool DebugContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
 {
-	_ctx.ContextFlags = contextFlags;
-	if (GetThreadContext(hThread, &_ctx) == FALSE) {
+	auto thread_ctx = _thread_ctx.lock();
+	thread_ctx->ContextFlags = contextFlags;
+	if (GetThreadContext(hThread, thread_ctx.get()) == FALSE) {
 		return false;
 	}
 	return true;
 }
 bool DebugContext::setThreadContext(const ScopeHandle<>& hThread) const
 {
-	if (SetThreadContext(hThread, &_ctx) == FALSE) {
+	auto thread_ctx = _thread_ctx.lock();
+	if (SetThreadContext(hThread, thread_ctx.get()) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
 void DebugContext::recoverRegisterRIP() noexcept {
+	auto thread_ctx = _thread_ctx.lock();
 #ifdef _WIN64
-	_ctx.Rip = reinterpret_cast<DWORD64>(_fp_exception_address);
+	thread_ctx->Rip = reinterpret_cast<DWORD64>(_fp_exception_address);
 #else
-	_ctx.Eip = reinterpret_cast<DWORD32>(_fp_exception_address);
+	thread_ctx->Eip = reinterpret_cast<DWORD32>(_fp_exception_address);
 #endif
 }
 
 bool DebugContext::bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept {
 	if (_dbg_executer.expired()) {
 		_dbg_executer = pDbgExecuter->weak_from_this();
+		_thread_ctx = pDbgExecuter->_thread_ctx;
 		return true;
 	}
 	return false;
@@ -53,20 +57,20 @@ bool DebugContext::startDebug() noexcept {
 }
 
 bool DebugContext::continueDebug(const ScopeHandle<>& hProcess) const noexcept {
-	if (WriteProcessMemory(hProcess, _fp_exception_address, &_int_code, sizeof(BYTE), NULL) == FALSE) {
+	if (WriteProcessMemory(hProcess, _fp_exception_address, &_int_code, sizeof(BYTE), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 bool DebugContext::stopDebug(const ScopeHandle<>& hProcess) const noexcept {
-	if (WriteProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), 0) == FALSE) {
+	if (WriteProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
 bool DebugContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
-	if (ReadProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), NULL) == FALSE) {
+	if (ReadProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), nullptr) == FALSE) {
 		return false;
 	}
 	return true;

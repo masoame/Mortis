@@ -22,7 +22,7 @@ int main()
 
 	dbgContext->regExceptionCallBack(
 		[](const DebugContext & ctx) {
-			
+			ctx;
 			static int count = 0;
 			spdlog::info("count: {}", ++count);
 		}

@@ -16,9 +16,12 @@ namespace Mortis::SysIntVecDbg
 		friend struct DebugContext;
 		DEBUG_EVENT _dbg_event;
 
+
 		std::jthread _dbg_thread;
 		std::map<DebugKey, std::unique_ptr<DebugContext>> _dbg_contexts;
 	protected:
+
+		std::shared_ptr<CONTEXT> _thread_ctx;
 		DWORD _th32ProcessID;
 
 		void dbgThrMain(std::stop_token st);
