@@ -3,12 +3,11 @@
 #include<string_view>
 namespace Mortis
 {
-	template<typename CharType, 
-		typename StrType = std::basic_string<CharType, std::char_traits<CharType>, std::allocator<CharType>>
-	> requires BC::IsSameType<CharType, char, wchar_t, char8_t, char16_t, char32_t>
+	template<typename CharType> 
 	auto ToUpperCaseStdString(std::basic_string_view<CharType> str_view)
-		-> StrType {
-		StrType result;
+		-> std::basic_string<CharType> 
+	{
+		std::basic_string<CharType>  result;
 		result.resize(str_view.size());
 		std::ranges::transform(str_view, result.begin(),
 			[](CharType c){ 
@@ -17,12 +16,11 @@ namespace Mortis
 		return result;
 	}
 
-	template<typename CharType,
-		typename StrType = std::basic_string<CharType, std::char_traits<CharType>, std::allocator<CharType>>
-	> requires BC::IsSameType<CharType, char, wchar_t, char8_t, char16_t, char32_t>
+	template<typename CharType>
 	auto ToLowerCaseStdString(std::basic_string_view<CharType> str_view)
-		-> StrType {
-		StrType result;
+		-> std::basic_string<CharType> 
+	{
+		std::basic_string<CharType> result;
 		result.resize(str_view.size());
 		std::ranges::transform(str_view, result.begin(),
 			[](CharType c)->CharType { 
@@ -32,15 +30,10 @@ namespace Mortis
 	}
 
 	template<typename CharType>
-	auto CaseInsensitiveCompare(std::basic_string_view<CharType> str_view1, std::basic_string_view<CharType> str_view2)
-		-> bool {
+	bool CaseInsensitiveCompare(std::basic_string_view<CharType> str_view1, std::basic_string_view<CharType> str_view2)
+	{
 		return ToUpperCaseStdString<CharType>(str_view1) == ToUpperCaseStdString<CharType>(str_view2);
 	}
-
-#ifdef _WIN32
-
-
-#endif // _WIN32
 }
 
 

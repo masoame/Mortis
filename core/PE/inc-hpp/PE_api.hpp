@@ -3,16 +3,32 @@
 
 namespace Mortis::PE 
 {
-	template<bool is_wide>
-	struct API : public BaseAPI<is_wide> {
-		using Process32FirstWrapper = std::conditional_t<is_wide, BT::StaticFunctorWrapper<Process32FirstW>, BT::StaticFunctorWrapper<Process32First>>;
-		using Process32NextWrapper = std::conditional_t<is_wide, BT::StaticFunctorWrapper<Process32NextW>, BT::StaticFunctorWrapper<Process32Next>>;
-		using Module32FirstWrapper = std::conditional_t<is_wide, BT::StaticFunctorWrapper<Module32FirstW>, BT::StaticFunctorWrapper<Module32First>>;
-		using Module32NextWrapper = std::conditional_t<is_wide, BT::StaticFunctorWrapper<Module32NextW>, BT::StaticFunctorWrapper<Module32Next>>;
-	};
+	template<typename T>
+		requires BC::IsSameType<T, char, wchar_t>
+	using Process32First = std::conditional_t<std::is_same_v<T, char>, 
+		BT::StaticFunctorWrapper<::Process32First>, 
+		BT::StaticFunctorWrapper<::Process32FirstW>>;
+
+	template<typename T>
+		requires BC::IsSameType<T, char, wchar_t>
+	using Process32Next = std::conditional_t<std::is_same_v<T, char>, 
+		BT::StaticFunctorWrapper<::Process32Next>, 
+		BT::StaticFunctorWrapper<::Process32NextW>>;
+
+	template<typename T>
+		requires BC::IsSameType<T, char, wchar_t>
+	using Module32First = std::conditional_t<std::is_same_v<T, char>,
+		BT::StaticFunctorWrapper<::Module32First>,
+		BT::StaticFunctorWrapper<::Module32FirstW>>;
+
+	template<typename T>
+		requires BC::IsSameType<T, char, wchar_t>
+	using Module32Next = std::conditional_t<std::is_same_v<T, char>,
+		BT::StaticFunctorWrapper<::Module32Next>,
+		BT::StaticFunctorWrapper<::Module32NextW>>;
 
 	template<typename AddressType = LPVOID>
-	inline auto MakeAddress(auto address, auto offset) noexcept 
+	constexpr auto MakeAddress(auto address, auto offset) noexcept 
 		-> LPVOID {
 		return reinterpret_cast<AddressType>(reinterpret_cast<SIZE_T>(address) + offset);
 	};

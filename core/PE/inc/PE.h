@@ -8,7 +8,6 @@ namespace Mortis::PE
 {
 	//打开id对应的进程句柄
 	template<typename HasIdType>
-		requires BC::IsSameType<HasIdType, PROCESSENTRY32* , PROCESSENTRY32W*, std::unique_ptr<PROCESSENTRY32>, std::unique_ptr<PROCESSENTRY32W>, DWORD>
 	auto OpenProcessHandle(const HasIdType& hasIdType, DWORD dwDesiredAccess = PROCESS_ALL_ACCESS, BOOL bInheritHandle = FALSE)
 		-> ScopeHandle<>;
 
@@ -16,26 +15,24 @@ namespace Mortis::PE
 		-> ScopeHandle<>;
 
 	//搜索进程
-	template<typename ProcessNameType, typename UseWrapper = BT::SearchProcessWrapper<ProcessNameType>, typename PROCESSENTRY32Wrapper = UseWrapper::TYPE::PROCESSENTRY32Wrapper>
-		requires BC::SearchProcessConcept<ProcessNameType, PROCESSENTRY32Wrapper>
-	auto SearchProcess(const ProcessNameType& processName) 
-		-> std::unique_ptr<PROCESSENTRY32Wrapper>;
+	template<typename Type>
+	auto SearchProcess(std::basic_string_view<Type> process_name_view)
+		-> std::unique_ptr<PROCESSENTRY32<Type>>;
 
 	//搜索模块
-	template<typename ModuleNameType, typename UseWrapper = BT::SearchModuleWrapper<ModuleNameType>, typename MODULEENTRY32Wrapper = UseWrapper::TYPE::MODULEENTRY32Wrapper>
-		requires BC::SearchModuleConcept<ModuleNameType, MODULEENTRY32Wrapper>
-	auto SearchModule(DWORD th32ProcessID, const ModuleNameType& ModuleName)
-		->std::unique_ptr<MODULEENTRY32Wrapper>;
+	template<typename Type>
+	auto SearchModule(DWORD th32ProcessID, std::basic_string_view<Type> module_name_view)
+		-> std::unique_ptr<MODULEENTRY32<Type>>;
 
 	//进程信息
-	template<typename T, typename UseWrapper = BT::ProcessInfoWrapper<T>, typename PROCESSENTRY32Wrapper = UseWrapper::TYPE::PROCESSENTRY32Wrapper>
+	template<typename T>
 	auto ProcessInfo()
-		-> std::vector<PROCESSENTRY32Wrapper>;
+		-> std::vector<PROCESSENTRY32<T>>;
 
 	//模块信息
-	template<typename T, typename UseWrapper = BT::ModuleInfoWrapper<T>, typename MODULEENTRY32Wrapper = UseWrapper::MODULEENTRY32Wrapper>
+	template<typename T>
 	auto ModuleInfo(DWORD th32ProcessID)
-		-> std::vector<MODULEENTRY32Wrapper>;
+		-> std::vector<MODULEENTRY32<T>>;
 
 	//获得DOS头和NT头
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)

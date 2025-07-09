@@ -7,6 +7,6 @@ using namespace Mortis::PE;
 int main() {
 
 
-	Inject
+	//Inject
 	return 0;
 }
