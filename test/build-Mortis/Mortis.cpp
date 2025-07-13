@@ -19,18 +19,18 @@ int main()
 		return -1;
 	}
 
-	auto dbgContext = std::make_unique<DebugContext>(&WriteFile);
+	auto dbg_context = std::make_unique<DebugContext>(&WriteFile);
 
-	dbgContext->regExceptionCallBack(
+	dbg_context->regExceptionCallBack(
 		[](const DebugContext & ctx) {
 			ctx;
 			static int count = 0;
 			spdlog::info("count: {}", ++count);
 		}
 	);
-	auto dbgExecutor = std::make_shared<DbgExecuter>(process_entry->th32ProcessID);
-	dbgExecutor->regDbgContext(std::move(dbgContext));
+	auto dbg_executor = std::make_shared<DbgExecuter>(process_entry->th32ProcessID);
+	dbg_executor->regDbgContext(std::move(dbg_context));
 
-	dbgExecutor->wait();
+	dbg_executor->wait();
 	return true;
 }
