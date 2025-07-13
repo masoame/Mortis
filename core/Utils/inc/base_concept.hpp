@@ -5,7 +5,7 @@
 namespace Mortis::BC
 {
 	template<typename T1, typename... T2>
-	concept IsSameType = (std::is_same_v<T1, T2> || ...);
+	concept HasType = (std::is_same_v<T1, T2> || ...);
 
 	template <typename T>
 	concept NotConst = not std::is_const_v<T>;

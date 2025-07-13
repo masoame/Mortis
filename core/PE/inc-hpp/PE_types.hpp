@@ -22,12 +22,12 @@ namespace Mortis::PE
 	using FuncArgPos = unsigned char;
 
 	template<typename T>
-		requires BC::IsSameType<T, char, wchar_t>
+		requires BC::HasType<T, char, wchar_t>
 	using PROCESSENTRY32 = std::conditional_t<std::is_same_v<T,char>, ::PROCESSENTRY32, ::PROCESSENTRY32W>;
 
 
 	template<typename T>
-		requires BC::IsSameType<T, char, wchar_t>
+		requires BC::HasType<T, char, wchar_t>
 	using MODULEENTRY32 = std::conditional_t<std::is_same_v<T, char>, ::MODULEENTRY32, ::MODULEENTRY32W>;
 }
 
