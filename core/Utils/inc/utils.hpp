@@ -26,6 +26,7 @@
 #include<future>
 #include<spdlog/spdlog.h>
 #include<format>
+#include<variant>
 
 #include<base_concept.hpp>
 #include<base_api.hpp>
