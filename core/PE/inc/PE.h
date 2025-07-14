@@ -2,8 +2,8 @@
 #include<sstream>
 #include <utils.hpp>
 #include <asm_types.hpp>
-#include <PE_template.hpp>
-
+#include <PE_types.hpp>
+#include <PE_api.hpp>
 namespace Mortis::PE
 {
 	//打开id对应的进程句柄
