@@ -8,19 +8,10 @@ int main() {
 
 	auto info_map = ProcessInfoMap(PROCESS_SZExeFile);
 
-	for(const auto& info : info_map)
-	{
-		std::cout << "\nprocess name: \n" << get<std::string>(info.first) << "\nprocess_id : \n";
-
-		if (std::holds_alternative<Mortis::PE::PROCESSENTRY32<char>>(info.second)) {
-			std::cout << std::get<Mortis::PE::PROCESSENTRY32<char>>(info.second).th32ProcessID << std::endl;
-		}
-		else {
-			for (const auto& value: std::get<std::vector<Mortis::PE::PROCESSENTRY32<char>>>(info.second)) {
-				std::cout << value.th32ProcessID << " ";
-			}
-			std::cout << std::endl;
-		}
+	if (info_map["Notepad.exe"].is_single()) {
+		auto module_map = ModuleInfoMap(info_map["Notepad.exe"].get_single().th32ProcessID, MODULE_SZModule);
+		spdlog::info("find module name: {}", module_map["Kernel32.DLL"].szModule);
+		spdlog::info("find module name: {}", (void*)module_map["kernel32.dll"].hModule);
 	}
 
 	return 0;

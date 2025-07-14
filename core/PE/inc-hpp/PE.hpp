@@ -154,4 +154,37 @@ namespace Mortis::PE
 		};
 		return info;
 	}
+
+	template<typename T>
+	auto ModuleInfoMap(DWORD th32ProcessID, EnumInfoMapType key_type)
+		-> std::map<std::variant<HMODULE, NoCaseStdString<T>>, MODULEENTRY32<T>>
+	{
+		std::map<std::variant<HMODULE, NoCaseStdString<T>>, MODULEENTRY32<T>> info_map;
+		auto info_arr = ModuleInfo<T>(th32ProcessID);
+		switch (key_type)
+		{
+		case MODULE_HMODULE:
+			for (const MODULEENTRY32<T>& info : info_arr)
+			{
+				if (info_map.contains(info.hModule) == true) {
+					throw std::exception("error repeat hModule");
+				}
+				info_map.emplace(info.hModule, info);
+			}
+			break;
+		case MODULE_SZModule:
+			for (const MODULEENTRY32<T>& info : info_arr)
+			{
+				std::basic_string_view<T> szModule = info.szModule;
+				if (auto iter = info_map.find(szModule); iter != info_map.cend()) {
+					iter->second = info;
+				}
+				info_map.emplace(szModule, info);
+			}
+			break;
+		default:
+			throw std::exception();
+		}
+		return info_map;
+	}
 }

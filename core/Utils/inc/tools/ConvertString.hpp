@@ -3,28 +3,28 @@
 #include<string_view>
 namespace Mortis
 {
-	template<typename CharType> 
+	template<typename CharType>
 	auto ToUpperCaseStdString(std::basic_string_view<CharType> str_view)
-		-> std::basic_string<CharType> 
+		-> std::basic_string<CharType>
 	{
 		std::basic_string<CharType>  result;
 		result.resize(str_view.size());
 		std::ranges::transform(str_view, result.begin(),
-			[](CharType c){ 
-				return static_cast<CharType>(std::toupper(c)); 
+			[](CharType c) {
+				return static_cast<CharType>(std::toupper(c));
 			});
 		return result;
 	}
 
 	template<typename CharType>
 	auto ToLowerCaseStdString(std::basic_string_view<CharType> str_view)
-		-> std::basic_string<CharType> 
+		-> std::basic_string<CharType>
 	{
 		std::basic_string<CharType> result;
 		result.resize(str_view.size());
 		std::ranges::transform(str_view, result.begin(),
-			[](CharType c)->CharType { 
-				return static_cast<CharType>(std::tolower(c)); 
+			[](CharType c)->CharType {
+				return static_cast<CharType>(std::tolower(c));
 			});
 		return result;
 	}
@@ -34,6 +34,20 @@ namespace Mortis
 	{
 		return ToUpperCaseStdString<CharType>(str_view1) == ToUpperCaseStdString<CharType>(str_view2);
 	}
+
+	template<typename CharType>
+	struct NoCaseStdString : private std::basic_string<CharType>
+	{
+		template<typename... Args>
+		NoCaseStdString(Args&&... args): 
+			std::basic_string<CharType>(std::forward<Args>(args)...)
+		{
+			dynamic_cast<std::basic_string<CharType>&>(*this) = ToLowerCaseStdString<CharType>(*this);
+		}
+
+		auto operator <=> (const NoCaseStdString& other) const noexcept = default;
+
+	};
 }
 
 
