@@ -1,8 +1,8 @@
 #pragma once
-#include<sstream>
 #include <utils.hpp>
 #include <asm_types.hpp>
-#include <PE_template.hpp>
+#include<PE_api.hpp>
+#include<PE_types.hpp>
 
 namespace Mortis::PE
 {

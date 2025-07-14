@@ -1,6 +1,5 @@
 #pragma once
 #include<PE.h>
-
 namespace Mortis::PE
 {
 	template<typename HasIdType>
