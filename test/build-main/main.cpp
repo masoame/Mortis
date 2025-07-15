@@ -6,24 +6,24 @@ using namespace Mortis::PE;
 
 int main() {
 
-	auto info_map = ProcessInfoMap(PROCESS_SZExeFile);
+	auto process_info_map = ProcessInfoMap(PROCESS_SZExeFile);
 
-	for(const auto& info : info_map)
-	{
-		std::cout << "\nprocess name: \n" << get<std::string>(info.first) << "\nprocess_id : \n";
-
-		if (std::holds_alternative<Mortis::PE::PROCESSENTRY32<char>>(info.second)) {
-			std::cout << std::get<Mortis::PE::PROCESSENTRY32<char>>(info.second).th32ProcessID << std::endl;
-		}
-		else {
-			for (const auto& value: std::get<std::vector<Mortis::PE::PROCESSENTRY32<char>>>(info.second)) {
-				std::cout << value.th32ProcessID << " ";
-			}
-			std::cout << std::endl;
-		}
+	bool isSingle;
+	if (process_info_map.contains("notepad.exe")) {
+		isSingle = process_info_map["notepad.exe"].isSingle();
+		isSingle ?
+			std::cout << "notepad.exe is single" << std::endl :
+			std::cout << "notepad.exe is multiple" << std::endl;
+	}else {
+		std::cout << "not found" << std::endl;
+		return -1;
 	}
 
-	std::cout << std::boolalpha << info_map.contains("notepad.exe") << std::endl;
+	if (isSingle) {
+		auto module_info_map = ModuleInfoMap(process_info_map["notepad.exe"].getValue().th32ProcessID, MODULE_NAME_LOWER);
+		std::cout << "image base address : " << module_info_map["kernel32.dll"].hModule << std::endl;
+		std::cout << "image base name : " << module_info_map["kernel32.dll"].szModule << std::endl;
+	}
 
 	return 0;
 }

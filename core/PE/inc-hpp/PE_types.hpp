@@ -28,19 +28,19 @@ namespace Mortis::PE
 		PROCESS_ID,
 		PROCESS_SZExeFile,
 
-		MODULE_HANDLE,
+		MODULE_HMODULE,
 		MODULE_NAME,
-		MODULE_NAME_TOPPER = MODULE_NAME,
-		MODULE_NAME_LOWWER,
+		MODULE_NAME_UPPER = MODULE_NAME,
+		MODULE_NAME_LOWER,
 	};
 
 
-	template<typename T>
+	template<typename T = char>
 		requires BC::HasType<T, char, wchar_t>
 	using PROCESSENTRY32 = std::conditional_t<std::is_same_v<T,char>, ::PROCESSENTRY32, ::PROCESSENTRY32W>;
 
 
-	template<typename T>
+	template<typename T = char>
 		requires BC::HasType<T, char, wchar_t>
 	using MODULEENTRY32 = std::conditional_t<std::is_same_v<T, char>, ::MODULEENTRY32, ::MODULEENTRY32W>;
 }

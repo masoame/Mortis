@@ -19,6 +19,31 @@ namespace Mortis
 				std::get<std::vector<T>>(*this).emplace_back(std::forward<Args>(args)...);
 			}
 		}
+		
+		std::vector<T>& getVector() {
+			return std::get<std::vector<T>>(*this);
+		}
+
+		const std::vector<T>& getVector() const {
+			return std::get<std::vector<T>>(*this);
+		}
+
+		T& getValue() {
+			return std::get<T>(*this);
+		}
+
+		const T& getValue() const {
+			return std::get<T>(*this);
+		}
+
+		bool isMultiple() const {
+			return std::holds_alternative<std::vector<T>>(*this);
+		}
+
+		bool isSingle() const {
+			return std::holds_alternative<T>(*this);
+		}
+
 	};
 
 	enum class CodePage : unsigned int

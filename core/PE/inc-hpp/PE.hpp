@@ -98,14 +98,13 @@ namespace Mortis::PE
 			SingleOrMultiple<PROCESSENTRY32<T>>
 		> info_map;
 
-		auto info_arr = ProcessInfo<T>();
+		const auto info_arr = ProcessInfo<T>();
 
 		switch (key_type)
 		{
 		case PROCESS_ID:
 
-			for (const PROCESSENTRY32<T>& info : info_arr)
-			{
+			for (const PROCESSENTRY32<T>& info : info_arr){
 				if (info_map.contains(info.th32ProcessID) == true) {
 					throw std::exception("error repeat th32ProcessID");
 				}
@@ -115,8 +114,7 @@ namespace Mortis::PE
 			break;
 		case PROCESS_SZExeFile:
 
-			for (const PROCESSENTRY32<T>& info : info_arr)
-			{
+			for (const PROCESSENTRY32<T>& info : info_arr){
 				std::basic_string<T> szExeFile(info.szExeFile);
 				if (auto iter = info_map.find(szExeFile); iter != info_map.cend()) {
 					iter->second.emplace_back(info);
@@ -153,5 +151,50 @@ namespace Mortis::PE
 			bFound = Module32Next<T>()(hProcessSnap, &module_entry);
 		};
 		return info;
+	}
+
+	template<typename T>
+	auto ModuleInfoMap(DWORD th32ProcessID, EnumInfoMapType key_type)
+		-> std::map<std::variant<HMODULE, std::basic_string<T>>, MODULEENTRY32<T>>
+	{
+		std::map<std::variant<HMODULE, std::basic_string<T>>, MODULEENTRY32<T>> info_map;
+		const auto info_arr = ModuleInfo<T>(th32ProcessID);
+		switch (key_type)
+		{
+		case MODULE_HMODULE:
+
+			for (const MODULEENTRY32<T>& info : info_arr){
+				if (info_map.contains(info.hModule) == true) {
+					throw std::exception("error repeat hModule");
+				}
+				info_map.emplace(info.hModule, info);
+			}
+			break;
+
+		case MODULE_NAME_UPPER:
+
+			for (const MODULEENTRY32<T>& info : info_arr) {
+				std::basic_string<T> szModule = ToUpperCaseStdString<T>(info.szModule);
+				if (info_map.contains(szModule) == true) {
+					throw std::exception("error repeat szModule");
+				}
+				info_map.emplace(szModule, info);
+			}
+
+			break;
+		case MODULE_NAME_LOWER:
+
+			for (const MODULEENTRY32<T>& info : info_arr) {
+				std::basic_string<T> szModule = ToLowerCaseStdString<T>(info.szModule);
+				if (info_map.contains(szModule) == true) {
+					throw std::exception("error repeat szModule");
+				}
+				info_map.emplace(szModule, info);
+			}
+			break;
+		default:
+			throw std::exception();
+		}
+		return info_map;
 	}
 }
