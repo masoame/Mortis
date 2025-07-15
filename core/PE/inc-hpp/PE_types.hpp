@@ -21,6 +21,20 @@ namespace Mortis::PE
 	using FuncPtr = LPVOID;
 	using FuncArgPos = unsigned char;
 
+	using ProcessId = DWORD;
+
+	enum EnumInfoMapType
+	{
+		PROCESS_ID,
+		PROCESS_SZExeFile,
+
+		MODULE_HANDLE,
+		MODULE_NAME,
+		MODULE_NAME_TOPPER = MODULE_NAME,
+		MODULE_NAME_LOWWER,
+	};
+
+
 	template<typename T>
 		requires BC::HasType<T, char, wchar_t>
 	using PROCESSENTRY32 = std::conditional_t<std::is_same_v<T,char>, ::PROCESSENTRY32, ::PROCESSENTRY32W>;

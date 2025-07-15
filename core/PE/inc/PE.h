@@ -1,9 +1,9 @@
 #pragma once
-#include<sstream>
 #include <utils.hpp>
 #include <asm_types.hpp>
-#include <PE_types.hpp>
-#include <PE_api.hpp>
+#include<PE_api.hpp>
+#include<PE_types.hpp>
+
 namespace Mortis::PE
 {
 	//打开id对应的进程句柄
@@ -15,24 +15,35 @@ namespace Mortis::PE
 		-> ScopeHandle<>;
 
 	//搜索进程
-	template<typename Type>
-	auto SearchProcess(std::basic_string_view<Type> process_name_view)
-		-> std::unique_ptr<PROCESSENTRY32<Type>>;
+	template<typename T = char>
+	auto SearchProcess(std::basic_string_view<T> process_name_view)
+		-> std::unique_ptr<PROCESSENTRY32<T>>;
 
 	//搜索模块
-	template<typename Type>
-	auto SearchModule(DWORD th32ProcessID, std::basic_string_view<Type> module_name_view)
-		-> std::unique_ptr<MODULEENTRY32<Type>>;
+	template<typename T = char>
+	auto SearchModule(DWORD th32ProcessID, std::basic_string_view<T> module_name_view)
+		-> std::unique_ptr<MODULEENTRY32<T>>;
 
 	//进程信息
-	template<typename T>
+	template<typename T = char>
 	auto ProcessInfo()
 		-> std::vector<PROCESSENTRY32<T>>;
 
+	template<typename T = char>
+	auto ProcessInfoMap(EnumInfoMapType key_type)
+		-> std::map<
+		std::variant<ProcessId, std::basic_string<T>>,
+		SingleOrMultiple<PROCESSENTRY32<T>>
+		>;
+
 	//模块信息
-	template<typename T>
+	template<typename T = char>
 	auto ModuleInfo(DWORD th32ProcessID)
 		-> std::vector<MODULEENTRY32<T>>;
+
+	template<typename T = char>
+	auto ModuleInfoMap(DWORD th32ProcessID, EnumInfoMapType key_type)
+		-> std::map<std::variant<HMODULE, std::basic_string<T>>, MODULEENTRY32<T>>;
 
 	//获得DOS头和NT头
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)
