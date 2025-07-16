@@ -15,6 +15,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/inc-hpp/tools-hpp
 )
 
+target_precompile_headers(${PROJECT_NAME} 
+	PRIVATE 
+		${CMAKE_CURRENT_SOURCE_DIR}/inc/PE.h
+)
+
 target_link_libraries(${PROJECT_NAME} 
 	Utils
 )

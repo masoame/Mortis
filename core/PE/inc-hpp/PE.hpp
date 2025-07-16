@@ -98,14 +98,13 @@ namespace Mortis::PE
 			SingleOrMultiple<PROCESSENTRY32<T>>
 		> info_map;
 
-		auto info_arr = ProcessInfo<T>();
+		const auto info_arr = ProcessInfo<T>();
 
 		switch (key_type)
 		{
 		case PROCESS_ID:
 
-			for (const PROCESSENTRY32<T>& info : info_arr)
-			{
+			for (const PROCESSENTRY32<T>& info : info_arr){
 				if (info_map.contains(info.th32ProcessID) == true) {
 					throw std::exception("error repeat th32ProcessID");
 				}
@@ -115,8 +114,7 @@ namespace Mortis::PE
 			break;
 		case PROCESS_SZExeFile:
 
-			for (const PROCESSENTRY32<T>& info : info_arr)
-			{
+			for (const PROCESSENTRY32<T>& info : info_arr){
 				std::basic_string<T> szExeFile(info.szExeFile);
 				if (auto iter = info_map.find(szExeFile); iter != info_map.cend()) {
 					iter->second.emplace_back(info);
