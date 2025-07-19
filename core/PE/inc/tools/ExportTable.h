@@ -3,8 +3,7 @@
 
 namespace Mortis::PE::Exp
 {
-	struct ExportTable
-	{
+	struct ExportTable {
 		Ordinal _ordinal;
 		Rva _rva;
 		std::string _func_name;
@@ -20,7 +19,7 @@ namespace Mortis::PE::Exp
 
 	//获得导出表
 	auto GetTable(HANDLE ProcessHandle, HMODULE BaseAddress)
-		-> std::vector<std::tuple<Ordinal, Rva, std::string>>;
+		-> std::vector<ExportTable>;
 
 	//显示导出表
 	auto ShowTable(HANDLE ProcessHandle, HMODULE BaseAddress)

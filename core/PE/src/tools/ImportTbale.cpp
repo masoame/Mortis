@@ -52,11 +52,11 @@ namespace Mortis::PE::Imp
 	}
 
 	auto GetINTAndIATData(HANDLE ProcessHandle, HMODULE BaseAddress, const std::vector<std::pair<IMAGE_THUNK_DATA, IMAGE_THUNK_DATA>>& INTAndIAT)
-		-> std::vector<std::tuple<Ordinal, Hint, std::string, void*>>
+		-> std::vector<ImportTable>
 	{
 		char Name[256];
 		PIMAGE_IMPORT_BY_NAME IMBN = (PIMAGE_IMPORT_BY_NAME)Name;
-		std::vector<std::tuple<Ordinal, Hint, std::string, void*>> Data{};
+		std::vector<ImportTable> Data{};
 		for (auto& [INT, IAT] : INTAndIAT) {
 
 			if (IMAGE_SNAP_BY_ORDINAL(INT.u1.Ordinal))
@@ -73,21 +73,32 @@ namespace Mortis::PE::Imp
 	}
 
 	auto GetTable(HANDLE ProcessHandle, HMODULE BaseAddress)
-		-> std::vector<std::tuple<IMAGE_IMPORT_DESCRIPTOR, std::string, std::vector<std::tuple<Ordinal, Hint, std::string, void*>>>>
+		-> std::vector<std::tuple<CaseInsensitiveStdString<char>, std::vector<ImportTable>>>
 	{
-		char Name[256]{ 0 };
-		std::vector<std::tuple<IMAGE_IMPORT_DESCRIPTOR, std::string, std::vector<std::tuple<Ordinal, Hint, std::string, void*>>>> ImportTable{};
+		std::array<char, 256> export_function_name;
+		std::vector<std::tuple<CaseInsensitiveStdString<char>, std::vector<ImportTable>>> Imp_table{};
 		auto ImpDesGroup = GetDescriptorGroup(ProcessHandle, BaseAddress);
 		for (auto& ImpDes : ImpDesGroup) {
-			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ImpDes.Name), &Name, sizeof(Name) - 1, 0) == false)
+			if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, ImpDes.Name), export_function_name.data(), export_function_name.size() - 1, 0) == false) {
 				return {};
+			}
 
 			auto INTAndIAT = GetINTAndIAT(ProcessHandle, BaseAddress, ImpDes);
 			auto ImportAddressTable = GetINTAndIATData(ProcessHandle, BaseAddress, INTAndIAT);
 
-			ImportTable.emplace_back(ImpDes, Name, std::move(ImportAddressTable));
+			Imp_table.emplace_back(export_function_name.data(), std::move(ImportAddressTable));
 		}
-		return ImportTable;
+		return Imp_table;
+	}
+
+	auto GetTableMap(HANDLE ProcessHandle, HMODULE BaseAddress)
+		-> std::map<
+		CaseInsensitiveStdString<char>,
+		std::vector<ImportTable>
+		>
+	{
+		ProcessHandle, BaseAddress;
+		return {};
 	}
 
 	auto ShowImportTable(HANDLE ProcessHandle, HMODULE BaseAddress)
@@ -96,8 +107,8 @@ namespace Mortis::PE::Imp
 		auto ss = std::make_unique<std::stringstream>();
 		auto ImpTable = GetTable(ProcessHandle, BaseAddress);
 
-		for (auto& [ImpDes, Name, ImportAddressTable] : ImpTable) {
-			*ss << "\nmoduleName:" << Name << "\n" << std::endl;
+		for (const auto& [Name, ImportAddressTable] : ImpTable) {
+			*ss << "\nmoduleName:" << Name.view() << "\n" << std::endl;
 			for (auto& [ordinal, hint, name, addr] : ImportAddressTable) {
 				*ss << "Ordinal: " << ordinal << " \tHint: " << std::hex << hint << " \tFunctionAddr: " << addr << "  \tFunctionName: " << name << std::endl;
 			}

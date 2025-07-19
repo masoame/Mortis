@@ -43,7 +43,7 @@ namespace Mortis::PE
 
 	template<typename T = char>
 	auto ModuleInfoMap(DWORD th32ProcessID, EnumInfoMapType key_type)
-		-> std::map<std::variant<HMODULE, NoCaseStdString<T>>, MODULEENTRY32<T>>;
+		-> std::map<std::variant<HMODULE, CaseInsensitiveStdString<T>>, MODULEENTRY32<T>>;
 
 	//获得DOS头和NT头
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)

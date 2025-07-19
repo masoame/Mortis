@@ -24,9 +24,13 @@
 #include<functional>
 #include<any>
 #include<future>
-#include<spdlog/spdlog.h>
 #include<format>
 #include<variant>
+#include<filesystem>
+
+
+#include<spdlog/spdlog.h>
+
 
 #include<base_concept.hpp>
 #include<base_api.hpp>
@@ -40,5 +44,5 @@
 
 namespace os
 {
-	extern std::optional<std::wstring> GetModuleFileNameW(HMODULE module = NULL);
+	std::wstring GetModuleFileNameW(HMODULE module = NULL);
 }

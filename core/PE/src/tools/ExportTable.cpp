@@ -35,7 +35,7 @@ namespace Mortis::PE::Exp
 	}
 
 	auto GetTable(HANDLE ProcessHandle, HMODULE BaseAddress)
-		-> std::vector<std::tuple<Ordinal, Rva, std::string>>
+		-> std::vector<ExportTable>
 	{
 		auto ExpDir = GetDirectory(ProcessHandle, BaseAddress);
 		if (ExpDir == nullptr) {
@@ -45,7 +45,7 @@ namespace Mortis::PE::Exp
 		if (Namestable.empty()) {
 			return {};
 		}
-		std::vector<std::tuple<Ordinal, Rva, std::string>> ExportTable{ ExpDir->NumberOfNames,{} };
+		std::vector<ExportTable> ExportTable{ ExpDir->NumberOfNames,{} };
 
 		std::array<char, 256> ProcName;
 
@@ -85,7 +85,7 @@ namespace Mortis::PE::Exp
 		const auto ExpTable = GetTable(ProcessHandle, BaseAddress);
 		for (const auto& [ordinal, addr, name] : ExpTable) {
 			if (name == fcName) {
-				return reinterpret_cast<FuncPtr>(MakeAddress(BaseAddress, addr));
+				return MakeAddress<FuncPtr>(BaseAddress, addr);
 			}
 		}
 		return nullptr;
@@ -98,7 +98,7 @@ namespace Mortis::PE::Exp
 		std::vector<FuncPtr> result;
 		for (const auto& [ordinal, addr, name] : ExpTable) {
 			if (std::find(fcNameGroup.begin(), fcNameGroup.end(), name) != fcNameGroup.end()) {
-				result.emplace_back(reinterpret_cast<FuncPtr>(MakeAddress(BaseAddress, addr)));
+				result.emplace_back(MakeAddress<FuncPtr>(BaseAddress, addr));
 			}
 		}
 		return result;

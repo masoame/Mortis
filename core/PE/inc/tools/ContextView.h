@@ -23,6 +23,10 @@ namespace Mortis::PE
 	public:
 		ContextView(const CONTEXT& context) : _context(context) {}
 
+		operator const CONTEXT& () const {
+			return _context;
+		}
+
 		auto getArg(std::size_t location, std::function<std::any(DWORD64)> callToConvertType, CallConventions callconventions = STDCALL_X64)
 			-> std::any;
 	};

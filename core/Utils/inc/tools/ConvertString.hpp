@@ -36,17 +36,38 @@ namespace Mortis
 	}
 
 	template<typename CharType>
-	struct NoCaseStdString : private std::basic_string<CharType>
+	struct CaseInsensitiveStdString : std::basic_string<CharType>
 	{
 		template<typename... Args>
-		NoCaseStdString(Args&&... args): 
-			std::basic_string<CharType>(std::forward<Args>(args)...)
+		CaseInsensitiveStdString(Args&&... args) :
+			std::basic_string<CharType>(std::forward<Args>(args)...),
+			_lowerStdString(ToLowerCaseStdString<CharType>(dynamic_cast<std::basic_string<CharType>&>(*this)))
 		{
-			dynamic_cast<std::basic_string<CharType>&>(*this) = ToLowerCaseStdString<CharType>(*this);
 		}
 
-		auto operator <=> (const NoCaseStdString& other) const noexcept = default;
+		operator std::basic_string_view<CharType>() const {
+			return dynamic_cast<const std::basic_string<CharType>&>(*this);
+		}
 
+		std::basic_string_view<CharType> view() const {
+			return dynamic_cast<const std::basic_string<CharType>&>(*this);
+		}
+
+		auto operator <=> (const CaseInsensitiveStdString& other) const noexcept {
+			return _lowerStdString <=> other._lowerStdString;
+		}
+
+		void releaseToStdString(std::basic_string<CharType>& target) {
+			target = std::move(dynamic_cast<std::basic_string<CharType>&>(*this));
+			_lowerStdString.clear();
+		}
+
+		void release(std::basic_string<CharType>& target) {
+			dynamic_cast<std::basic_string<CharType>&>(*this).clear();
+			_lowerStdString.clear();
+		}
+
+		mutable std::basic_string<CharType> _lowerStdString;
 	};
 }
 

@@ -6,7 +6,7 @@ namespace Mortis::PE
 	auto OpenProcessHandle(const HasIdType& hasIdType, DWORD dwDesiredAccess , BOOL bInheritHandle)
 		-> ScopeHandle<>
 	{
-		constexpr static auto isId = std::is_same_v<DWORD, HasIdType>;
+		constexpr const static auto isId = std::is_same_v<DWORD, HasIdType>;
 		if constexpr (isId) {
 			return OpenProcess(dwDesiredAccess, bInheritHandle, hasIdType);
 		} else {
@@ -116,7 +116,7 @@ namespace Mortis::PE
 
 			for (const PROCESSENTRY32<T>& info : info_arr){
 				std::basic_string<T> szExeFile(info.szExeFile);
-				if (auto iter = info_map.find(szExeFile); iter != info_map.cend()) {
+				if (const auto iter = info_map.find(szExeFile); iter != info_map.cend()) {
 					iter->second.emplace_back(info);
 				}
 				info_map.emplace(std::move(szExeFile), info);
@@ -126,7 +126,6 @@ namespace Mortis::PE
 
 		default:
 			throw std::exception();
-
 		}
 		return info_map;
 	}
@@ -155,9 +154,9 @@ namespace Mortis::PE
 
 	template<typename T>
 	auto ModuleInfoMap(DWORD th32ProcessID, EnumInfoMapType key_type)
-		-> std::map<std::variant<HMODULE, NoCaseStdString<T>>, MODULEENTRY32<T>>
+		-> std::map<std::variant<HMODULE, CaseInsensitiveStdString<T>>, MODULEENTRY32<T>>
 	{
-		std::map<std::variant<HMODULE, NoCaseStdString<T>>, MODULEENTRY32<T>> info_map;
+		std::map<std::variant<HMODULE, CaseInsensitiveStdString<T>>, MODULEENTRY32<T>> info_map;
 		auto info_arr = ModuleInfo<T>(th32ProcessID);
 		switch (key_type)
 		{

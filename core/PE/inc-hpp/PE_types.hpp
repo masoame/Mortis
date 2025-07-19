@@ -32,7 +32,6 @@ namespace Mortis::PE
 		MODULE_SZModule,
 	};
 
-
 	template<typename T = char>
 		requires BC::HasType<T, char, wchar_t>
 	using PROCESSENTRY32 = std::conditional_t<std::is_same_v<T,char>, ::PROCESSENTRY32, ::PROCESSENTRY32W>;
