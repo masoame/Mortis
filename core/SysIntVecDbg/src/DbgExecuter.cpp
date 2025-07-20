@@ -58,7 +58,6 @@ void DbgExecuter::dbgThrMain(std::stop_token st)
 
 		}
 		else if (_dbg_event.dwDebugEventCode == EXIT_THREAD_DEBUG_EVENT) {
-
 		}
 
 		if (ContinueDebugEvent(_dbg_event.dwProcessId, _dbg_event.dwThreadId, DBG_CONTINUE) == FALSE) {

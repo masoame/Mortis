@@ -59,13 +59,13 @@ namespace Mortis::PE::Imp
 		std::vector<ImportTable> Data{};
 		for (auto& [INT, IAT] : INTAndIAT) {
 
-			if (IMAGE_SNAP_BY_ORDINAL(INT.u1.Ordinal))
-			{
+			if (IMAGE_SNAP_BY_ORDINAL(INT.u1.Ordinal)){
 				Data.emplace_back(static_cast<Ordinal>(IMAGE_ORDINAL(INT.u1.Ordinal)), static_cast<Hint>(0), "", reinterpret_cast<void*>(IAT.u1.Function));
 			}
-			else
-			{
-				if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, INT.u1.AddressOfData), &Name, sizeof(Name), 0) == false) break;
+			else{
+				if (ReadProcessMemory(ProcessHandle, MakeAddress(BaseAddress, INT.u1.AddressOfData), &Name, sizeof(Name), 0) == false) {
+					break;
+				}
 				Data.emplace_back(static_cast<Ordinal>(0), IMBN->Hint, reinterpret_cast<char*>(IMBN->Name), reinterpret_cast<void*>(IAT.u1.Function));
 			}
 		}

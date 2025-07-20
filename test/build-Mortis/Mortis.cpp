@@ -11,12 +11,12 @@ int main()
 {
 	system("chcp 65001");
 
-	std::string_view process_name("notepad.exe");
-	auto process_entry = SearchProcess(process_name);
-	if (process_entry == nullptr) {
-		std::cout << "Process not found" << std::endl;
+	const auto process_entry = ProcessInfoMap(PROCESS_ID)[(DWORD)22332];
+	if (process_entry.is_multiple()) {
+		spdlog::info("发现多个进程: {}", process_entry.get_multiple().size());
 		return -1;
 	}
+	const auto& process_entry_single = process_entry.get_single();
 
 	auto dbg_context = std::make_unique<DebugContext>(&WriteFile);
 
@@ -27,9 +27,9 @@ int main()
 			spdlog::info("count: {}", ++count);
 		}
 	);
-	auto dbg_executor = std::make_shared<DbgExecuter>(process_entry->th32ProcessID);
+	auto dbg_executor = std::make_shared<DbgExecuter>(process_entry_single.th32ProcessID);
 	dbg_executor->regDbgContext(std::move(dbg_context));
 
 	dbg_executor->wait();
-	return true;
+	return 0;
 }

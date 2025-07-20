@@ -5,8 +5,7 @@ namespace Mortis::SysIntVecDbg
 {
 	class DbgExecuter;
 
-	class DebugKey {
-	public:
+	struct DebugKey {
 		DWORD _dw_exception_code;
 		PVOID _fp_exception_address;
 
