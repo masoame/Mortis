@@ -41,8 +41,8 @@ void DbgExecuter::dbgThrMain(std::stop_token st)
                 ScopeExecutor resumeThread{ [&ctx, hThread = std::move(hDbgThread)]() mutable {
                    if (ctx->applyThreadContext(std::move(hThread)) == false) {
                        spdlog::error(std::format("{}:{} error!!!", __FILE__, __LINE__));
-                   }
-                } };
+                   }} 
+				};
 				if (ctx->exceptionCallBack()) {
 					continue;
 				}
