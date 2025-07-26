@@ -3,9 +3,10 @@
 using namespace Mortis::SysIntVecDbg;
 
 DbgExecuter::DbgExecuter(DWORD th32ProcessID) :
-	_thread_ctx(new CONTEXT{}),
+	_dbg_event{},
+	_thread_ctx(std::make_shared<CONTEXT>()),
 	_th32ProcessID(th32ProcessID),
-	_dbg_thread(std::bind(&DbgExecuter::dbgThrMain, this, std::placeholders::_1))
+	_dbg_thread{ std::bind(&DbgExecuter::dbgThrMain, this, std::placeholders::_1) }
 { }
 
 DbgExecuter::~DbgExecuter() {
@@ -30,7 +31,7 @@ void DbgExecuter::dbgThrMain(std::stop_token st)
 	{
 		if (_dbg_event.dwDebugEventCode == EXCEPTION_DEBUG_EVENT) {
 
-			DebugKey debugKey{
+			DbgKey debugKey{
 				._dw_exception_code = exception_record.ExceptionCode,
 				._fp_exception_address = exception_record.ExceptionAddress
 			};
@@ -41,8 +42,8 @@ void DbgExecuter::dbgThrMain(std::stop_token st)
                 ScopeExecutor resumeThread{ [&ctx, hThread = std::move(hDbgThread)]() mutable {
                    if (ctx->applyThreadContext(std::move(hThread)) == false) {
                        spdlog::error(std::format("{}:{} error!!!", __FILE__, __LINE__));
-                   }
-                } };
+                   }} 
+				};
 				if (ctx->exceptionCallBack()) {
 					continue;
 				}
@@ -67,7 +68,7 @@ void DbgExecuter::dbgThrMain(std::stop_token st)
 	}
 	return;
 }
-bool DbgExecuter::regDbgContext(std::unique_ptr<DebugContext>&& dbgContext)
+bool DbgExecuter::regDbgContext(std::unique_ptr<DbgContext>&& dbgContext)
 {
 	if (_dbg_contexts.contains(*dbgContext) == false && 
 			dbgContext->bindDbgExecuter(shared_from_this()) && 

@@ -5,33 +5,44 @@ using namespace Mortis::PE;
 using namespace Mortis::SysIntVecDbg;
 
 
-DebugContext::DebugContext(PVOID fp_exception_address, DWORD dw_exception_code, PE::INT_TYPE int_code)
-{
-	_fp_exception_address = fp_exception_address;
-	_dw_exception_code = dw_exception_code;
-	_int_code = int_code;
-}
+DbgContext::DbgContext(PVOID fp_exception_address, DWORD dw_exception_code, PE::INT_TYPE int_code) :
+	DbgKey{
+		._dw_exception_code = dw_exception_code,
+		._fp_exception_address = fp_exception_address
+	},
+	_int_code(int_code),
+	_origin_code(0)
+{ }
 
-bool DebugContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
+bool DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
 {
 	auto thread_ctx = _thread_ctx.lock();
+	if (thread_ctx == nullptr) {
+		return false;
+	}
 	thread_ctx->ContextFlags = contextFlags;
 	if (GetThreadContext(hThread, thread_ctx.get()) == FALSE) {
 		return false;
 	}
 	return true;
 }
-bool DebugContext::setThreadContext(const ScopeHandle<>& hThread) const
+bool DbgContext::setThreadContext(const ScopeHandle<>& hThread) const
 {
 	auto thread_ctx = _thread_ctx.lock();
+	if (thread_ctx == nullptr) {
+		return false;
+	}
 	if (SetThreadContext(hThread, thread_ctx.get()) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
-void DebugContext::recoverRegisterRIP() noexcept {
+void DbgContext::recoverRegisterRIP() noexcept {
 	auto thread_ctx = _thread_ctx.lock();
+	if (thread_ctx == nullptr) {
+		return;
+	}
 #ifdef _WIN64
 	thread_ctx->Rip = reinterpret_cast<DWORD64>(_fp_exception_address);
 #else
@@ -39,7 +50,7 @@ void DebugContext::recoverRegisterRIP() noexcept {
 #endif
 }
 
-bool DebugContext::bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept {
+bool DbgContext::bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept {
 	if (_dbg_executer.expired()) {
 		_dbg_executer = pDbgExecuter->weak_from_this();
 		_thread_ctx = pDbgExecuter->_thread_ctx;
@@ -47,7 +58,7 @@ bool DebugContext::bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecu
 	}
 	return false;
 }
-bool DebugContext::startDebug() noexcept {
+bool DbgContext::startDebug() noexcept {
 	auto pDbgExecutor = _dbg_executer.lock();
 	if (!pDbgExecutor) {
 		return false;
@@ -56,27 +67,27 @@ bool DebugContext::startDebug() noexcept {
 	return saveOrginCode(hProcess) && continueDebug(hProcess);
 }
 
-bool DebugContext::continueDebug(const ScopeHandle<>& hProcess) const noexcept {
+bool DbgContext::continueDebug(const ScopeHandle<>& hProcess) const noexcept {
 	if (WriteProcessMemory(hProcess, _fp_exception_address, &_int_code, sizeof(BYTE), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
-bool DebugContext::stopDebug(const ScopeHandle<>& hProcess) const noexcept {
+bool DbgContext::stopDebug(const ScopeHandle<>& hProcess) const noexcept {
 	if (WriteProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
-bool DebugContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
+bool DbgContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
 	if (ReadProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
-bool DebugContext::setIntCode(INT_TYPE int_code) noexcept {
+bool DbgContext::setIntCode(INT_TYPE int_code) noexcept {
 	//if (INT_TABLE.contains(int_code)) {
 
 	//}
@@ -84,12 +95,12 @@ bool DebugContext::setIntCode(INT_TYPE int_code) noexcept {
 	return false;
 }
 
-void DebugContext::regExceptionCallBack(std::function<void(DebugContext& )> callBackFunc)
+void DbgContext::regExceptionCallBack(std::function<void(DbgContext& )> callBackFunc)
 {
 	_call_exception_handler = std::bind(callBackFunc,std::ref(*this));
 }
 
-bool DebugContext::exceptionCallBack() const 
+bool DbgContext::exceptionCallBack() 
 {
 	try {
 		_call_exception_handler();
@@ -101,7 +112,7 @@ bool DebugContext::exceptionCallBack() const
 }
 
 
-auto DebugContext::refreshThreadContext()
+auto DbgContext::refreshThreadContext()
 	->ScopeHandle<>
 {
 	auto pDbgExecutor = _dbg_executer.lock();
@@ -119,7 +130,7 @@ auto DebugContext::refreshThreadContext()
 	}
 	return dbg_thr;
 }
-bool DebugContext::applyThreadContext(ScopeHandle<>&& threadScopeHandle)
+bool DbgContext::applyThreadContext(ScopeHandle<>&& threadScopeHandle)
 {
 	recoverRegisterRIP();
 

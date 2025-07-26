@@ -18,10 +18,10 @@ int main()
 	}
 	const auto& process_entry_single = process_entry.get_single();
 
-	auto dbg_context = std::make_unique<DebugContext>(&WriteFile);
-
+	auto dbg_context = std::make_unique<DbgContext>(&WriteFile);
+	
 	dbg_context->regExceptionCallBack(
-		[](const DebugContext & ctx) {
+		[](DbgContext& ctx) {
 			ctx;
 			static int count = 0;
 			spdlog::info("count: {}", ++count);

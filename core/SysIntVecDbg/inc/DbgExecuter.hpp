@@ -13,24 +13,19 @@ namespace Mortis::SysIntVecDbg
 
 	class DbgExecuter : public std::enable_shared_from_this<DbgExecuter> 
 	{
-		friend struct DebugContext;
+		friend struct DbgContext;
+	private:
 		DEBUG_EVENT _dbg_event;
-
-
 		std::jthread _dbg_thread;
-		std::map<DebugKey, std::unique_ptr<DebugContext>> _dbg_contexts;
-	protected:
-
+		std::map<DbgKey, std::unique_ptr<DbgContext>> _dbg_contexts;
 		std::shared_ptr<CONTEXT> _thread_ctx;
 		DWORD _th32ProcessID;
-
 		void dbgThrMain(std::stop_token st);
-		BOOL DebugEventExector();
 	public:
 		explicit DbgExecuter(DWORD th32ProcessID);
 		~DbgExecuter();
 
-		bool regDbgContext(std::unique_ptr<DebugContext>&& dbgContext);
+		bool regDbgContext(std::unique_ptr<DbgContext>&& dbgContext);
 		void wait();
 	};
 }
