@@ -4,6 +4,6 @@ namespace Mortis::SysIntVecDbg
 {
 	class DbgContextControl : DbgContext
 	{
-
+		
 	};
 }
