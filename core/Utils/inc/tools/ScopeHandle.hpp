@@ -27,55 +27,54 @@ namespace Mortis
 
 		unique_ptr _ptr;
 	public:
-		ScopeHandle() noexcept {}
-
 		ScopeHandle(ScopeHandle& handle) = delete;
 
-		ScopeHandle(ScopeHandle&& handle) noexcept
+		constexpr ScopeHandle() noexcept {}
+		constexpr ScopeHandle(ScopeHandle&& handle) noexcept
 			: _ptr(handle.release()) {
 		}
 
-		ScopeHandle(Ptr ptr) noexcept
+		constexpr ScopeHandle(Ptr ptr) noexcept
 			: _ptr(ptr) {
 		}
 
-		ScopeHandle& operator=(Ptr ptr) noexcept {
+		constexpr ScopeHandle& operator=(Ptr ptr) noexcept {
 			_ptr.reset(ptr); 
 			return *this;
 		}
 
-		ScopeHandle& operator=(ScopeHandle&& handle) noexcept {
+		constexpr ScopeHandle& operator=(ScopeHandle&& handle) noexcept {
 			_ptr.reset(handle.release());
 			return *this;
 		}
 
-		operator const Ptr() const noexcept {
+		constexpr operator const Ptr() const noexcept {
 			return _ptr.get();
 		}
-		operator Ptr& () noexcept {
+		constexpr operator Ptr& () noexcept {
 			return *reinterpret_cast<SecPtr>(this);
 		}
-		operator bool() const noexcept {
+		constexpr operator bool() const noexcept {
 			return _ptr.get() != nullptr;
 		}
 
-		SecPtr operator&() {
+		constexpr SecPtr operator&() {
 			return reinterpret_cast<SecPtr>(this);
 		}
 
-		Ptr operator->() const noexcept {
+		constexpr Ptr operator->() const noexcept {
 			return _ptr.get();
 		}
 
-		void reset(Ptr ptr = nullptr) noexcept {
+		constexpr void reset(Ptr ptr = nullptr) noexcept {
 			_ptr.reset(ptr);
 		}
 
-		Ptr release() noexcept {
+		constexpr Ptr release() noexcept {
 			return _ptr.release();
 		}
 
-		Ptr get() const noexcept {
+		constexpr Ptr get() const noexcept {
 			return _ptr.get();
 		}
 

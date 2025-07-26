@@ -15,11 +15,11 @@ namespace Mortis
 		ScopeExecutor(ScopeExecutor&&) = delete;
 		ScopeExecutor(ScopeExecutor&) = delete;
 
-		ScopeExecutor(PurgeFunc&& func, Args&& ...args) :
+		constexpr ScopeExecutor(PurgeFunc&& func, Args&& ...args) :
 			_func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<Args>(args)... } {
 		}
 
-		~ScopeExecutor() {
+		constexpr ~ScopeExecutor() {
 			std::apply(_func, _args);
 		}
 	};

@@ -8,7 +8,7 @@ namespace Mortis
 	struct SingleOrMultiple : public std::variant<T, std::vector<T>>
 	{
 		template<typename ...Args>
-		void emplace_back(Args&&... args) {
+		constexpr void emplace_back(Args&&... args) {
 			if (std::holds_alternative<T>(*this)) {
 				std::vector<T> multiple_values;
 				multiple_values.emplace_back(std::move(std::get<T>(*this)));
@@ -20,28 +20,42 @@ namespace Mortis
 			}
 		}
 
-		bool is_single() const noexcept {
+		constexpr bool is_single() const noexcept {
 			return std::holds_alternative<T>(*this);
 		}
 
-		bool is_multiple() const noexcept {
+		constexpr bool is_multiple() const noexcept {
 			return std::holds_alternative<std::vector<T>>(*this);
 		}
 
-		T& get_single() {
+		constexpr T& get_single() {
 			return std::get<T>(*this);
 		}
 
-		const T& get_single() const {
+		constexpr const T& get_single() const {
 			return std::get<T>(*this);
 		}
 
-		std::vector<T>& get_multiple() {
+		constexpr std::vector<T>& get_multiple() {
 			return std::get<std::vector<T>>(*this);
 		}
 
-		const std::vector<T>& get_multiple() const {
+		constexpr const std::vector<T>& get_multiple() const {
 			return std::get<std::vector<T>>(*this);
+		}
+
+	};
+
+	struct WordVariant : public std::variant<BYTE, WORD, DWORD32, DWORD64>
+	{
+		constexpr std::size_t get_size() const { return 1ULL << this->index(); }
+		template<typename T>
+		constexpr T& get() {
+			 std::get<T>(*this);
+		}
+		template<typename T>
+		constexpr const T& get() const {
+			return std::get<T>(*this);
 		}
 
 	};

@@ -2,8 +2,6 @@
 
 namespace Mortis::PE::Imp
 {
-
-
 	struct ImportTable {
 		Ordinal _ordinal;
 		Hint _hint;

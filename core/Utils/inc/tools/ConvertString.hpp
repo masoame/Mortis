@@ -4,7 +4,7 @@
 namespace Mortis
 {
 	template<typename CharType>
-	auto ToUpperCaseStdString(std::basic_string_view<CharType> str_view)
+	constexpr auto ToUpperCaseStdString(std::basic_string_view<CharType> str_view)
 		-> std::basic_string<CharType>
 	{
 		std::basic_string<CharType>  result;
@@ -17,7 +17,7 @@ namespace Mortis
 	}
 
 	template<typename CharType>
-	auto ToLowerCaseStdString(std::basic_string_view<CharType> str_view)
+	constexpr auto ToLowerCaseStdString(std::basic_string_view<CharType> str_view)
 		-> std::basic_string<CharType>
 	{
 		std::basic_string<CharType> result;
@@ -30,7 +30,7 @@ namespace Mortis
 	}
 
 	template<typename CharType>
-	bool CaseInsensitiveCompare(std::basic_string_view<CharType> str_view1, std::basic_string_view<CharType> str_view2)
+	constexpr bool CaseInsensitiveCompare(std::basic_string_view<CharType> str_view1, std::basic_string_view<CharType> str_view2)
 	{
 		return ToUpperCaseStdString<CharType>(str_view1) == ToUpperCaseStdString<CharType>(str_view2);
 	}
@@ -39,30 +39,30 @@ namespace Mortis
 	struct CaseInsensitiveStdString : std::basic_string<CharType>
 	{
 		template<typename... Args>
-		CaseInsensitiveStdString(Args&&... args) :
+		constexpr CaseInsensitiveStdString(Args&&... args) :
 			std::basic_string<CharType>(std::forward<Args>(args)...),
 			_lowerStdString(ToLowerCaseStdString<CharType>(dynamic_cast<std::basic_string<CharType>&>(*this)))
 		{
 		}
 
-		operator std::basic_string_view<CharType>() const {
+		constexpr operator std::basic_string_view<CharType>() const {
 			return dynamic_cast<const std::basic_string<CharType>&>(*this);
 		}
 
-		std::basic_string_view<CharType> view() const {
+		constexpr std::basic_string_view<CharType> view() const {
 			return dynamic_cast<const std::basic_string<CharType>&>(*this);
 		}
 
-		auto operator <=> (const CaseInsensitiveStdString& other) const noexcept {
+		constexpr auto operator <=> (const CaseInsensitiveStdString& other) const noexcept {
 			return _lowerStdString <=> other._lowerStdString;
 		}
 
-		void releaseToStdString(std::basic_string<CharType>& target) {
+		constexpr void releaseToStdString(std::basic_string<CharType>& target) {
 			target = std::move(dynamic_cast<std::basic_string<CharType>&>(*this));
 			_lowerStdString.clear();
 		}
 
-		void release(std::basic_string<CharType>& target) {
+		constexpr void release(std::basic_string<CharType>& target) {
 			dynamic_cast<std::basic_string<CharType>&>(*this).clear();
 			_lowerStdString.clear();
 		}
