@@ -11,7 +11,7 @@ int main()
 {
 	system("chcp 65001");
 
-	const auto process_entry = ProcessInfoMap(PROCESS_ID)[(DWORD)22332];
+	const auto process_entry = ProcessInfoMap(PROCESS_SZExeFile)["Notepad.exe"];
 	if (process_entry.is_multiple()) {
 		spdlog::info("发现多个进程: {}", process_entry.get_multiple().size());
 		return -1;

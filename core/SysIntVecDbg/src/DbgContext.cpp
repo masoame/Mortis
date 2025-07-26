@@ -5,13 +5,17 @@ using namespace Mortis::PE;
 using namespace Mortis::SysIntVecDbg;
 
 
-DbgContext::DbgContext(PVOID fp_exception_address, DWORD dw_exception_code, PE::INT_TYPE int_code) :
+DbgContext::DbgContext(PVOID fp_exception_address, DWORD dw_exception_code, std::span<const BYTE> replace_code) :
 	DbgKey{
 		._dw_exception_code = dw_exception_code,
 		._fp_exception_address = fp_exception_address
 	},
-	_int_code(int_code),
+	_replace_code(replace_code.begin(),replace_code.cend()),
 	_origin_code(0)
+{ }
+
+DbgContext::DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace_code):
+	DbgContext(fp_exception_address,0, replace_code)
 { }
 
 bool DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
@@ -68,30 +72,29 @@ bool DbgContext::startDebug() noexcept {
 }
 
 bool DbgContext::continueDebug(const ScopeHandle<>& hProcess) const noexcept {
-	if (WriteProcessMemory(hProcess, _fp_exception_address, &_int_code, sizeof(BYTE), nullptr) == FALSE) {
+	if (WriteProcessMemory(hProcess, _fp_exception_address, _replace_code.data(), _replace_code.size(), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 bool DbgContext::stopDebug(const ScopeHandle<>& hProcess) const noexcept {
-	if (WriteProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), nullptr) == FALSE) {
+	if (WriteProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
 bool DbgContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
-	if (ReadProcessMemory(hProcess, _fp_exception_address, &_origin_code, sizeof(BYTE), nullptr) == FALSE) {
+	_origin_code.resize(_replace_code.size());
+	if (ReadProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) == FALSE) {
 		return false;
 	}
 	return true;
 }
 
-bool DbgContext::setIntCode(INT_TYPE int_code) noexcept {
-	//if (INT_TABLE.contains(int_code)) {
-
-	//}
-	int_code;
+bool DbgContext::setCode(std::span<const BYTE> replace_code) noexcept {
+	_replace_code.resize(replace_code.size());
+	std::copy(replace_code.begin(), replace_code.end(), _replace_code.begin());
 	return false;
 }
 

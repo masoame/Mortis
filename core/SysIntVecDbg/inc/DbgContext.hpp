@@ -18,9 +18,13 @@ namespace Mortis::SysIntVecDbg
 	private:
 		std::weak_ptr<DbgExecuter> _dbg_executer{};
 		std::weak_ptr<CONTEXT> _thread_ctx{};
-		PE::INT_TYPE _int_code;
+
+		std::vector<BYTE> _origin_code;
+		std::vector<BYTE> _replace_code;
+
+		//PE::INT_TYPE _int_code;
 		std::function<void()> _call_exception_handler;
-		BYTE _origin_code;
+		//BYTE _origin_code;
 
 		bool exceptionCallBack();
 	protected:
@@ -31,7 +35,7 @@ namespace Mortis::SysIntVecDbg
 		bool startDebug() noexcept;
 
 		bool saveOrginCode(const ScopeHandle<>& hProcess)noexcept;
-		bool setIntCode(PE::INT_TYPE int_code) noexcept;
+		bool setCode(std::span<const BYTE> int_code) noexcept;
 
 		void recoverRegisterRIP() noexcept;
 		bool applyThreadContext(ScopeHandle<>&& threadHandle);
@@ -42,7 +46,8 @@ namespace Mortis::SysIntVecDbg
 		auto refreshThreadContext()
 			-> ScopeHandle<>;
 	public:
-		DbgContext(PVOID fp_exception_address, DWORD _dw_exception_code = EXCEPTION_BREAKPOINT, PE::INT_TYPE _int_code = PE::INT_TYPE::INT3);
+		DbgContext(PVOID fp_exception_address, DWORD _dw_exception_code = EXCEPTION_BREAKPOINT, std::span<const BYTE> replace_code = PE::INT3);
+		DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace_code);
 		DbgContext() = default;
 
 		void regExceptionCallBack(std::function<void(DbgContext& )> callBackFunc);

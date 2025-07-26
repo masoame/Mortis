@@ -10,10 +10,11 @@ namespace Mortis::PE
 	using HOOKWORD = DWORD64;
 #endif
 
-	enum class INT_TYPE {
-		INT3 = 0xCC,
-		INT1 = 0xCD01,
-	};
+	constexpr static const std::array<BYTE,1> INT3{ static_cast<BYTE>(0xCC) };
+	//enum class INT_TYPE  {
+	//	INT3 = ,
+	//	INT1 = 0xCD01,
+	//};
 
 	using Rva = DWORD;
 	using Ordinal = WORD;
