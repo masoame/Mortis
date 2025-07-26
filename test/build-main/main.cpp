@@ -3,7 +3,6 @@
 using namespace Mortis;
 using namespace Mortis::PE;
 
-
 int main() {
 
 	auto info_map = ProcessInfoMap(PROCESS_SZExeFile);
