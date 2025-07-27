@@ -4,6 +4,7 @@
 namespace Mortis::SysIntVecDbg
 {
 	class DbgExecuter;
+	class DbgContextControl;
 
 	struct DbgKey {
 		DWORD _dw_exception_code;
@@ -21,10 +22,7 @@ namespace Mortis::SysIntVecDbg
 
 		std::vector<BYTE> _origin_code;
 		std::vector<BYTE> _replace_code;
-
-		//PE::INT_TYPE _int_code;
 		std::function<void()> _call_exception_handler;
-		//BYTE _origin_code;
 
 		bool exceptionCallBack();
 	protected:
@@ -41,7 +39,7 @@ namespace Mortis::SysIntVecDbg
 		bool applyThreadContext(ScopeHandle<>&& threadHandle);
 
 		bool getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags = CONTEXT_ALL);
-		bool setThreadContext(const ScopeHandle<>& hThread) const;
+		bool setThreadContext(const ScopeHandle<>& hThread, const CONTEXT & = {}) const;
 
 		auto refreshThreadContext()
 			-> ScopeHandle<>;
@@ -51,5 +49,9 @@ namespace Mortis::SysIntVecDbg
 		DbgContext() = default;
 
 		void regExceptionCallBack(std::function<void(DbgContext& )> callBackFunc);
+
+		std::optional<CONTEXT> tryGetContext() const;
+
+		DbgContextControl control();
 	};
 }

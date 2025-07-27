@@ -22,9 +22,9 @@ int main()
 	
 	dbg_context->regExceptionCallBack(
 		[](DbgContext& ctx) {
-			ctx;
-			static int count = 0;
-			spdlog::info("count: {}", ++count);
+
+			ctx.control().regHook<int>();
+
 		}
 	);
 	auto dbg_executor = std::make_shared<DbgExecuter>(process_entry_single.th32ProcessID);

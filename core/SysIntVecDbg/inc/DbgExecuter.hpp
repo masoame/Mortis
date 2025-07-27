@@ -1,6 +1,7 @@
 #pragma once
 #include<PE.h>
 #include<DbgContext.hpp>
+#include<DbgContextControl.hpp>
 
 namespace Mortis::SysIntVecDbg
 {
@@ -15,11 +16,14 @@ namespace Mortis::SysIntVecDbg
 	{
 		friend struct DbgContext;
 	private:
-		DEBUG_EVENT _dbg_event;
 		std::jthread _dbg_thread;
-		std::map<DbgKey, std::unique_ptr<DbgContext>> _dbg_contexts;
-		std::shared_ptr<CONTEXT> _thread_ctx;
+
 		DWORD _th32ProcessID;
+		DEBUG_EVENT _dbg_event;
+		std::shared_ptr<CONTEXT> _thread_ctx;
+
+		std::map<DbgKey, std::unique_ptr<DbgContext>> _dbg_contexts;
+
 		void dbgThrMain(std::stop_token st);
 	public:
 		explicit DbgExecuter(DWORD th32ProcessID);

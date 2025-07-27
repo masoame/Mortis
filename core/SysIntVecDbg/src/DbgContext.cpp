@@ -18,6 +18,16 @@ DbgContext::DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace
 	DbgContext(fp_exception_address,0, replace_code)
 { }
 
+std::optional<CONTEXT> DbgContext::tryGetContext() const
+{
+	auto thread_ctx = _thread_ctx.lock();
+	if (thread_ctx == nullptr) {
+		return std::nullopt;
+	}
+	return *thread_ctx;
+}
+
+
 bool DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
 {
 	auto thread_ctx = _thread_ctx.lock();
@@ -30,13 +40,10 @@ bool DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFla
 	}
 	return true;
 }
-bool DbgContext::setThreadContext(const ScopeHandle<>& hThread) const
+bool DbgContext::setThreadContext(const ScopeHandle<>& hThread, const CONTEXT & ctx) const
 {
-	auto thread_ctx = _thread_ctx.lock();
-	if (thread_ctx == nullptr) {
-		return false;
-	}
-	if (SetThreadContext(hThread, thread_ctx.get()) == FALSE) {
+	auto thread_ctx = tryGetContext().value_or(ctx);
+	if (SetThreadContext(hThread, &thread_ctx) == FALSE) {
 		return false;
 	}
 	return true;
