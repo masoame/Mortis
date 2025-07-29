@@ -5,29 +5,20 @@
 
 namespace Mortis::PE
 {
-	enum CallConventions {
-		STDCALL_X64,
-		CDECL_X64,
-		FASTCALL_X64,
-
-		STDCALL_X86,
-		CDECL_X86,
-		FASTCALL_X86,
-	};
-
-
+	template<typename FuncType>
 	class ContextView
 	{
 	private:
 		const CONTEXT& _context;
 	public:
 		ContextView(const CONTEXT& context) : _context(context) {}
+		
+		DWORD sp();
 
 		operator const CONTEXT& () const {
 			return _context;
 		}
 
-		auto getArg(std::size_t location, std::function<std::any(DWORD64)> callToConvertType, CallConventions callconventions = STDCALL_X64)
-			-> std::any;
+		auto getArg(std::size_t location, CallingConvention callconventions = X64_CALL);
 	};
 }

@@ -60,7 +60,7 @@ namespace Mortis
 
 	};
 
-	enum class CodePage : unsigned int
+	enum CodePage : unsigned int
 	{
 		UTF_8 = CP_UTF8,
 		UTF_16 = 1200,
@@ -70,4 +70,14 @@ namespace Mortis
 		GB2312 = 936,
 		SHIFT_JIS = 932,
 	};
+
+	enum CallingConvention 
+	{
+		X86_CALL = 0x01,
+		X86_CDECL = 0x02,
+		
+		X64_CALL = 0x04,
+		X64_CDECL = 0x08, 
+	};
+
 }

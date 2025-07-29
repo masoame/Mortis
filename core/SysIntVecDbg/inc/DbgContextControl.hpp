@@ -2,16 +2,17 @@
 
 namespace Mortis::SysIntVecDbg
 {
-	class DbgContextControl : DbgContext
+	class DbgContextControl
 	{
-		using DbgContext::DbgContext;
-	protected:
-
+	private:
+		DbgContext& _dbg_ctx;
 	public:
+		DbgContextControl(DbgContext& dbg_ctx);
 
 		template<typename T>
-		DbgContextControl& regHook() {
-		
+		DbgContextControl& regHook(std::size_t regisisterPos,CallingConvention callingConvention = X64_CALL) {
+			
+			return *this;
 		}
 
 		DbgContextControl& regHookString();
