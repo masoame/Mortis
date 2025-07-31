@@ -25,7 +25,14 @@ namespace Mortis::SysIntVecDbg
 		std::function<void()> _call_exception_handler;
 
 		bool exceptionCallBack();
+
 	protected:
+		std::shared_ptr<DbgExecuter> executor() const;
+		std::expected<std::shared_ptr<DbgExecuter>, std::string_view> try_executor() const;
+
+		std::shared_ptr<CONTEXT> ctx() const;
+		std::expected<std::shared_ptr<CONTEXT>, std::string_view>  try_ctx() const;
+
 		bool bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept;
 
 		bool continueDebug(const ScopeHandle<>& hProcess) const noexcept;
@@ -38,8 +45,8 @@ namespace Mortis::SysIntVecDbg
 		void recoverRegisterRIP() noexcept;
 		bool applyThreadContext(ScopeHandle<>&& threadHandle);
 
-		bool getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags = CONTEXT_ALL);
-		bool setThreadContext(const ScopeHandle<>& hThread, const CONTEXT & = {}) const;
+		std::expected<std::shared_ptr<CONTEXT>, std::string_view> getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags = CONTEXT_ALL);
+		bool setThreadContext(const ScopeHandle<>& hThread, std::shared_ptr<CONTEXT> = std::make_shared<CONTEXT>()) const;
 
 		auto refreshThreadContext()
 			-> ScopeHandle<>;
@@ -50,7 +57,7 @@ namespace Mortis::SysIntVecDbg
 
 		void regExceptionCallBack(std::function<void(DbgContext& )> callBackFunc);
 
-		std::optional<CONTEXT> tryGetContext() const;
+
 
 		DbgContextControl control();
 	};

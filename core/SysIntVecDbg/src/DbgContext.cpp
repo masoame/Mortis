@@ -18,35 +18,49 @@ DbgContext::DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace
 	DbgContext(fp_exception_address,0, replace_code)
 { }
 
-std::optional<CONTEXT> DbgContext::tryGetContext() const
+std::shared_ptr<DbgExecuter> DbgContext::executor() const
 {
-	auto thread_ctx = _thread_ctx.lock();
-	if (thread_ctx == nullptr) {
-		return std::nullopt;
+	return _dbg_executer.lock();
+}
+std::shared_ptr<CONTEXT> DbgContext::ctx() const
+{
+	return _thread_ctx.lock();
+}
+
+std::expected<std::shared_ptr<DbgExecuter>, std::string_view> DbgContext::try_executor() const
+{
+	auto dbg_executer = executor();
+	if (dbg_executer == nullptr) {
+		return std::unexpected("no bind Executer");
 	}
-	return *thread_ctx;
+	return dbg_executer;
+}
+
+std::expected<std::shared_ptr<CONTEXT>,std::string_view> DbgContext::try_ctx() const
+{
+	auto thread_ctx = ctx();
+	if (thread_ctx == nullptr) {
+		return std::unexpected("no bind context");
+	}
+	return thread_ctx;
 }
 
 
-bool DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
+std::expected<std::shared_ptr<CONTEXT>, std::string_view> DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
 {
-	auto thread_ctx = _thread_ctx.lock();
-	if (thread_ctx == nullptr) {
-		return false;
-	}
-	thread_ctx->ContextFlags = contextFlags;
-	if (GetThreadContext(hThread, thread_ctx.get()) == FALSE) {
-		return false;
-	}
-	return true;
+	return try_ctx()
+		.and_then(
+			[&](std::shared_ptr<CONTEXT> ctx){
+				ctx->ContextFlags = contextFlags;
+				return GetThreadContext(hThread, ctx.get()) ? 
+					std::expected<std::shared_ptr<CONTEXT>,std::string_view>(ctx) :
+					std::unexpected("failed to getThreadContext!!!");
+			});
 }
-bool DbgContext::setThreadContext(const ScopeHandle<>& hThread, const CONTEXT & ctx) const
+bool DbgContext::setThreadContext(const ScopeHandle<>& hThread, std::shared_ptr<CONTEXT> ctx) const
 {
-	auto thread_ctx = tryGetContext().value_or(ctx);
-	if (SetThreadContext(hThread, &thread_ctx) == FALSE) {
-		return false;
-	}
-	return true;
+	const auto thread_ctx = try_ctx().value_or(ctx);
+	return SetThreadContext(hThread, thread_ctx.get()) != FALSE;
 }
 
 void DbgContext::recoverRegisterRIP() noexcept {
@@ -79,24 +93,15 @@ bool DbgContext::startDebug() noexcept {
 }
 
 bool DbgContext::continueDebug(const ScopeHandle<>& hProcess) const noexcept {
-	if (WriteProcessMemory(hProcess, _fp_exception_address, _replace_code.data(), _replace_code.size(), nullptr) == FALSE) {
-		return false;
-	}
-	return true;
+	return WriteProcessMemory(hProcess, _fp_exception_address, _replace_code.data(), _replace_code.size(), nullptr) != FALSE;
 }
 bool DbgContext::stopDebug(const ScopeHandle<>& hProcess) const noexcept {
-	if (WriteProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) == FALSE) {
-		return false;
-	}
-	return true;
+	return WriteProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) != FALSE;
 }
 
 bool DbgContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
 	_origin_code.resize(_replace_code.size());
-	if (ReadProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) == FALSE) {
-		return false;
-	}
-	return true;
+	return ReadProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) != FALSE;
 }
 
 bool DbgContext::setCode(std::span<const BYTE> replace_code) noexcept {
@@ -125,7 +130,7 @@ bool DbgContext::exceptionCallBack()
 auto DbgContext::refreshThreadContext()
 	->ScopeHandle<>
 {
-	auto pDbgExecutor = _dbg_executer.lock();
+	auto pDbgExecutor = executor();
 	if (!pDbgExecutor) {
 		return nullptr;
 	}
@@ -135,7 +140,8 @@ auto DbgContext::refreshThreadContext()
 	}
 
 	ScopeHandle dbg_thr = OpenThreadHandle(pDbgExecutor->_dbg_event.dwThreadId);
-	if (getThreadContext(dbg_thr) == false) {
+
+	if (getThreadContext(dbg_thr).has_value() == false) {
 		return nullptr;
 	}
 	return dbg_thr;
@@ -144,7 +150,7 @@ bool DbgContext::applyThreadContext(ScopeHandle<>&& threadScopeHandle)
 {
 	recoverRegisterRIP();
 
-	auto pDbgExecutor = _dbg_executer.lock();
+	auto pDbgExecutor = executor();
 	if (pDbgExecutor == nullptr) {
 		return false;
 	}

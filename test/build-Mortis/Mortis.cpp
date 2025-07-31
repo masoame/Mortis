@@ -22,8 +22,10 @@ int main()
 	
 	dbg_context->regExceptionCallBack(
 		[](DbgContext& ctx) {
-
-			ctx.control().regHook<int>(0);
+			ctx;
+			//ctx.control().regHook<int>(0);
+			static int i= 0;
+			std::cout << ++i << std::endl;
 
 		}
 	);

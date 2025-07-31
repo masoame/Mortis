@@ -27,6 +27,7 @@
 #include<format>
 #include<variant>
 #include<filesystem>
+#include<expected>
 
 
 #include<spdlog/spdlog.h>
