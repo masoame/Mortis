@@ -9,7 +9,6 @@ namespace Mortis::SysIntVecDbg
 	struct DbgKey {
 		DWORD _dw_exception_code;
 		PVOID _fp_exception_address;
-
 		auto operator<=>(const DbgKey&) const = default;
 	};
 
@@ -28,10 +27,10 @@ namespace Mortis::SysIntVecDbg
 
 	protected:
 		std::shared_ptr<DbgExecuter> executor() const;
-		std::expected<std::shared_ptr<DbgExecuter>, std::string_view> try_executor() const;
+		Expected<std::shared_ptr<DbgExecuter>> try_executor() const;
 
 		std::shared_ptr<CONTEXT> ctx() const;
-		std::expected<std::shared_ptr<CONTEXT>, std::string_view>  try_ctx() const;
+		Expected<std::shared_ptr<CONTEXT>>  try_ctx() const;
 
 		bool bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecuter) noexcept;
 
@@ -45,19 +44,17 @@ namespace Mortis::SysIntVecDbg
 		void recoverRegisterRIP() noexcept;
 		bool applyThreadContext(ScopeHandle<>&& threadHandle);
 
-		std::expected<std::shared_ptr<CONTEXT>, std::string_view> getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags = CONTEXT_ALL);
+		Expected<std::shared_ptr<CONTEXT>> getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags = CONTEXT_ALL);
 		bool setThreadContext(const ScopeHandle<>& hThread, std::shared_ptr<CONTEXT> = std::make_shared<CONTEXT>()) const;
 
 		auto refreshThreadContext()
-			-> ScopeHandle<>;
+			-> Expected<ScopeHandle<>>;
 	public:
 		DbgContext(PVOID fp_exception_address, DWORD _dw_exception_code = EXCEPTION_BREAKPOINT, std::span<const BYTE> replace_code = PE::INT3);
 		DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace_code);
 		DbgContext() = default;
 
 		void regExceptionCallBack(std::function<void(DbgContext& )> callBackFunc);
-
-
 
 		DbgContextControl control();
 	};

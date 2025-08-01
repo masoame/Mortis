@@ -14,8 +14,8 @@ DbgContext::DbgContext(PVOID fp_exception_address, DWORD dw_exception_code, std:
 	_origin_code(0)
 { }
 
-DbgContext::DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace_code):
-	DbgContext(fp_exception_address,0, replace_code)
+DbgContext::DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace_code) :
+	DbgContext(fp_exception_address, 0, replace_code)
 { }
 
 std::shared_ptr<DbgExecuter> DbgContext::executor() const
@@ -27,7 +27,7 @@ std::shared_ptr<CONTEXT> DbgContext::ctx() const
 	return _thread_ctx.lock();
 }
 
-std::expected<std::shared_ptr<DbgExecuter>, std::string_view> DbgContext::try_executor() const
+Expected<std::shared_ptr<DbgExecuter>> DbgContext::try_executor() const
 {
 	auto dbg_executer = executor();
 	if (dbg_executer == nullptr) {
@@ -36,7 +36,7 @@ std::expected<std::shared_ptr<DbgExecuter>, std::string_view> DbgContext::try_ex
 	return dbg_executer;
 }
 
-std::expected<std::shared_ptr<CONTEXT>,std::string_view> DbgContext::try_ctx() const
+Expected<std::shared_ptr<CONTEXT>> DbgContext::try_ctx() const
 {
 	auto thread_ctx = ctx();
 	if (thread_ctx == nullptr) {
@@ -46,25 +46,23 @@ std::expected<std::shared_ptr<CONTEXT>,std::string_view> DbgContext::try_ctx() c
 }
 
 
-std::expected<std::shared_ptr<CONTEXT>, std::string_view> DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
+Expected<std::shared_ptr<CONTEXT>> DbgContext::getThreadContext(const ScopeHandle<>& hThread, DWORD contextFlags)
 {
 	return try_ctx()
 		.and_then(
-			[&](std::shared_ptr<CONTEXT> ctx){
+			[&](std::shared_ptr<CONTEXT> ctx) {
 				ctx->ContextFlags = contextFlags;
-				return GetThreadContext(hThread, ctx.get()) ? 
-					std::expected<std::shared_ptr<CONTEXT>,std::string_view>(ctx) :
+				return GetThreadContext(hThread, ctx.get()) ? Expected<std::shared_ptr<CONTEXT>>(ctx) :
 					std::unexpected("failed to getThreadContext!!!");
-			});
+		});
 }
 bool DbgContext::setThreadContext(const ScopeHandle<>& hThread, std::shared_ptr<CONTEXT> ctx) const
 {
-	const auto thread_ctx = try_ctx().value_or(ctx);
-	return SetThreadContext(hThread, thread_ctx.get()) != FALSE;
+	return SetThreadContext(hThread, try_ctx().value_or(ctx).get()) != FALSE;
 }
 
 void DbgContext::recoverRegisterRIP() noexcept {
-	auto thread_ctx = _thread_ctx.lock();
+	auto thread_ctx = ctx();
 	if (thread_ctx == nullptr) {
 		return;
 	}
@@ -84,6 +82,7 @@ bool DbgContext::bindDbgExecuter(const std::shared_ptr<DbgExecuter>& pDbgExecute
 	return false;
 }
 bool DbgContext::startDebug() noexcept {
+
 	auto pDbgExecutor = _dbg_executer.lock();
 	if (!pDbgExecutor) {
 		return false;
@@ -93,15 +92,15 @@ bool DbgContext::startDebug() noexcept {
 }
 
 bool DbgContext::continueDebug(const ScopeHandle<>& hProcess) const noexcept {
-	return WriteProcessMemory(hProcess, _fp_exception_address, _replace_code.data(), _replace_code.size(), nullptr) != FALSE;
+	return hProcess && WriteProcessMemory(hProcess, _fp_exception_address, _replace_code.data(), _replace_code.size(), nullptr) != FALSE;
 }
 bool DbgContext::stopDebug(const ScopeHandle<>& hProcess) const noexcept {
-	return WriteProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) != FALSE;
+	return hProcess && WriteProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) != FALSE;
 }
 
 bool DbgContext::saveOrginCode(const ScopeHandle<>& hProcess) noexcept {
 	_origin_code.resize(_replace_code.size());
-	return ReadProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) != FALSE;
+	return hProcess && ReadProcessMemory(hProcess, _fp_exception_address, _origin_code.data(), _origin_code.size(), nullptr) != FALSE;
 }
 
 bool DbgContext::setCode(std::span<const BYTE> replace_code) noexcept {
@@ -128,23 +127,20 @@ bool DbgContext::exceptionCallBack()
 
 
 auto DbgContext::refreshThreadContext()
-	->ScopeHandle<>
+    -> Expected<ScopeHandle<>>
 {
-	auto pDbgExecutor = executor();
-	if (!pDbgExecutor) {
-		return nullptr;
-	}
-	const auto hProcess = OpenProcessHandle(pDbgExecutor->_th32ProcessID);
-	if (stopDebug(hProcess) == false) {
-		return nullptr;
-	}
-
-	ScopeHandle dbg_thr = OpenThreadHandle(pDbgExecutor->_dbg_event.dwThreadId);
-
-	if (getThreadContext(dbg_thr).has_value() == false) {
-		return nullptr;
-	}
-	return dbg_thr;
+    return try_executor()
+        .and_then([this](std::shared_ptr<DbgExecuter>&& pDbgExecutor) {
+            return stopDebug(OpenProcessHandle(pDbgExecutor->_th32ProcessID)) ?
+                Expected<ScopeHandle<>>(OpenThreadHandle(pDbgExecutor->_dbg_event.dwThreadId)) :
+				UnExpected("Unable to StopDebug");
+        })
+        .and_then([this](ScopeHandle<>&& dbg_thr) {
+            const auto ctx = getThreadContext(dbg_thr);
+            return ctx.has_value() ? 
+				Expected<ScopeHandle<>>(std::move(dbg_thr)) : 
+				UnExpected(ctx.error());
+        });
 }
 bool DbgContext::applyThreadContext(ScopeHandle<>&& threadScopeHandle)
 {
@@ -165,8 +161,5 @@ bool DbgContext::applyThreadContext(ScopeHandle<>&& threadScopeHandle)
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 	const auto hProcess = OpenProcessHandle(pDbgExecutor->_th32ProcessID);
-	if (continueDebug(hProcess) == false) {
-		return false;
-	}
-	return true;
+	return continueDebug(hProcess);
 }

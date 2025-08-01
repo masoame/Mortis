@@ -60,10 +60,19 @@ namespace Mortis
 
 	};
 
+	template<typename T>
+	using Expected = std::expected<T, std::string_view>;
+
+	using Expected_void = Expected<void>;
+	using Expected_bool = Expected<bool>;
+
+	using UnExpected = std::unexpected<std::string_view>;
+
 	enum CodePage : unsigned int
 	{
 		UTF_8 = CP_UTF8,
 		UTF_16 = 1200,
+
 		UTF_16BE = 1201,
 		UTF_32 = 12000,
 

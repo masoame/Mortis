@@ -3,15 +3,19 @@
 using namespace Mortis;
 using namespace Mortis::PE;
 
+std::expected<int, std::string_view> sum(int a,int b) {
+	if(a == 0 || b == 0) {
+		return std::unexpected("a or b is zero");
+	}
+	return a + b ;
+}
+
 int main() {
 
-	auto info_map = ProcessInfoMap(PROCESS_SZExeFile);
+	auto a = sum(6, 5).transform([](int a) {
+		std::printf("sum is %d\n", a);
+		return ;
+		});
 
-	if (info_map["Notepad.exe"].is_single()) {
-		auto module_map = ModuleInfoMap(info_map["Notepad.exe"].get_single().th32ProcessID, MODULE_SZModule);
-		::spdlog::info("find module name: {}", module_map["KerNel32.DLL"].szModule);
-		::spdlog::info("find module name: {}", (void*)module_map["kernel32.dll"].hModule);
-	}
-
-	return 0;
+	return a.has_value();
 }

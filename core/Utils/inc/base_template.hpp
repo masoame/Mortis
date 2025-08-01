@@ -4,7 +4,7 @@
 namespace Mortis::BT
 {
 	template <auto F>
-	using StaticFunctorWrapper = std::integral_constant<std::remove_reference_t<decltype(F)>, F>;
+	using StaticFunctorWrapper = std::integral_constant<std::decay_t<decltype(F)>, F>;
 
     template<typename T, typename... Args>
     constexpr auto get_type_positions_impl() {

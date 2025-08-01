@@ -31,8 +31,7 @@ namespace Mortis
 
 		constexpr ScopeHandle() noexcept {}
 		constexpr ScopeHandle(ScopeHandle&& handle) noexcept
-			: _ptr(handle.release()) {
-		}
+			: _ptr(handle.release()) {}
 
 		constexpr ScopeHandle(Ptr ptr) noexcept
 			: _ptr(ptr) {
@@ -55,7 +54,12 @@ namespace Mortis
 			return *reinterpret_cast<SecPtr>(this);
 		}
 		constexpr operator bool() const noexcept {
-			return _ptr.get() != nullptr;
+			if constexpr (std::is_same_v<HandleType, HANDLE>) {
+				return _ptr.get() != nullptr && _ptr.get() != INVALID_HANDLE_VALUE;
+			}
+			else {
+				return _ptr.get() != nullptr;
+			}
 		}
 
 		constexpr SecPtr operator&() {

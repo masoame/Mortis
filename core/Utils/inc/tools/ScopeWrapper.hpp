@@ -10,12 +10,11 @@ namespace Mortis
 	protected:
 		PurgeFunc _func;
 		std::tuple<Args...> _args;
-
 	public:
 		ScopeExecutor(ScopeExecutor&&) = delete;
 		ScopeExecutor(ScopeExecutor&) = delete;
 
-		constexpr ScopeExecutor(PurgeFunc&& func, Args&& ...args) :
+		constexpr explicit ScopeExecutor(PurgeFunc&& func, Args&& ...args) :
 			_func{ std::forward<PurgeFunc>(func) }, _args{ std::forward<Args>(args)... } {
 		}
 
@@ -25,5 +24,11 @@ namespace Mortis
 	};
 	template<typename PurgeFunc, typename...Args>
 	ScopeExecutor(PurgeFunc&&, Args&&...) -> ScopeExecutor<std::decay_t<PurgeFunc>, std::decay_t<Args>...>;
+
+	//template<typename PurgeFunc, typename...Args>
+	//	requires requires (BT::StaticFunctorWrapper<PurgeFunc>::type f, Args...args) { std::invoke(f, args...); }
+	//class ScopeExecutor(Args... args) {
+
+	//}
 
 }
