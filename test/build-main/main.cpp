@@ -3,19 +3,15 @@
 using namespace Mortis;
 using namespace Mortis::PE;
 
-std::expected<int, std::string_view> sum(int a,int b) {
-	if(a == 0 || b == 0) {
-		return std::unexpected("a or b is zero");
-	}
-	return a + b ;
-}
 
 int main() {
 
-	auto a = sum(6, 5).transform([](int a) {
-		std::printf("sum is %d\n", a);
-		return ;
-		});
+	std::vector<int> arr1 = { 0,1,2 };
+	std::vector<int> arr2 = { 121,2,3 };
+	std::copy(arr1.cbegin(), arr1.cend(), arr2.begin());
+	std::for_each(arr2.cbegin(), arr2.cend(), [](int a) {
+		std::cout << a << " ";
+	});
 
-	return a.has_value();
+	return 0;
 }

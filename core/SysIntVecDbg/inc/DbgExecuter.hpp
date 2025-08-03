@@ -30,6 +30,13 @@ namespace Mortis::SysIntVecDbg
 		~DbgExecuter();
 
 		bool regDbgContext(std::unique_ptr<DbgContext>&& dbgContext);
+
+
+
+		template<typename T>
+		bool regHook(std::unique_ptr<DbgContext>&& dbgContext) {
+
+		}
 		void wait();
 	};
 }

@@ -22,6 +22,7 @@ int main()
 	
 	dbg_context->regExceptionCallBack(
 		[](DbgContext& ctx) {
+			ctx.control();
 			ctx;
 			//ctx.control().regHook<int>(0);
 			static int i= 0;

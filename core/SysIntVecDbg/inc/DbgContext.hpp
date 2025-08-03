@@ -52,10 +52,9 @@ namespace Mortis::SysIntVecDbg
 	public:
 		DbgContext(PVOID fp_exception_address, DWORD _dw_exception_code = EXCEPTION_BREAKPOINT, std::span<const BYTE> replace_code = PE::INT3);
 		DbgContext(PVOID fp_exception_address, std::span<const BYTE> replace_code);
-		DbgContext() = default;
 
 		void regExceptionCallBack(std::function<void(DbgContext& )> callBackFunc);
 
-		DbgContextControl control();
+		DbgContextControl& control();
 	};
 }
