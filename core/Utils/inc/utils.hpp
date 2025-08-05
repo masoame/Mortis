@@ -3,6 +3,7 @@
 #ifdef _WIN32
 #include<Windows.h>
 #include<tlhelp32.h>
+//#include <Det>
 #else
 
 #endif
@@ -26,6 +27,7 @@
 #include<future>
 #include<format>
 #include<variant>
+#include<fstream>
 #include<filesystem>
 #include<expected>
 
