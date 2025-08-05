@@ -6,9 +6,9 @@ namespace Mortis::PE
 	template<typename FuncPtrType>
 	struct ReflFunc
 	{
-		FuncPtrType _function_address;
+		constexpr static FuncPtrType _function_address;
 
-		ReflFunc(FuncPtrType fun_ptr) {
+		constexpr ReflFunc(FuncPtrType fun_ptr) {
 			_function_address = fun_ptr;
 		}
 

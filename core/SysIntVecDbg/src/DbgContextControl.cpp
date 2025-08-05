@@ -2,14 +2,9 @@
 
 using namespace Mortis::SysIntVecDbg;
 
-DbgContextControl::DbgContextControl(DbgContext& dbg_ctx):
-	_dbg_ctx(dbg_ctx)
-{
 
-}
+DbgContextControl& DbgContextControl::regHookString(std::size_t parameterPos, CodePage codePage, CallingConvention callingConvention, std::size_t StringLenPos) {
 
 
-DbgContextControl& DbgContextControl::regHookString() {
-	
 	return *this;
 }
