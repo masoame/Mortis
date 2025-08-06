@@ -4,8 +4,25 @@
 namespace Mortis::PE {
 
 	auto OpenThreadHandle(DWORD dwThreadId, DWORD dwDesiredAccess, BOOL bInheritHandle)
-		-> ScopeHandle<> {
+		-> ScopeHandle<> 
+	{
 		return OpenThread(dwDesiredAccess, bInheritHandle, dwThreadId);
+	}
+
+	auto CreateProcessHandle(std::wstring_view file_path, DWORD dwCreationFlags = CREATE_SUSPENDED)
+		-> ScopeHandle<> 
+	{
+		STARTUPINFOW si{};
+		si.cb = sizeof(si);
+		PROCESS_INFORMATION pi{};
+		BOOL ret= CreateProcessW(file_path.data(), nullptr, nullptr, nullptr, false, dwCreationFlags, nullptr, nullptr, &si, &pi);
+		return ret ? ScopeHandle<>(pi.hProcess) : ScopeHandle<>(nullptr);
+	}
+
+	auto resumeThread(const ScopeHandle<>& threadHandle)
+		-> bool
+	{
+		return threadHandle && (ResumeThread(threadHandle) != static_cast<DWORD>(-1));
 	}
 
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)

@@ -3,5 +3,4 @@
 #include<base_template.hpp>
 namespace Mortis
 {
-
 }
