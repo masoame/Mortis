@@ -10,26 +10,31 @@ namespace Mortis::PE {
 	}
 
 	auto CreateProcessHandle(std::wstring_view file_path, DWORD dwCreationFlags = CREATE_SUSPENDED)
-		-> ScopeHandle<> 
+		-> std::pair<ScopeHandle<>, ScopeHandle<>>
 	{
 		STARTUPINFOW si{};
 		si.cb = sizeof(si);
 		PROCESS_INFORMATION pi{};
 		BOOL ret= CreateProcessW(file_path.data(), nullptr, nullptr, nullptr, false, dwCreationFlags, nullptr, nullptr, &si, &pi);
-		return ret ? ScopeHandle<>(pi.hProcess) : ScopeHandle<>(nullptr);
+		return ret ? make_pair(ScopeHandle<>(pi.hProcess), ScopeHandle<>(pi.hThread)) : make_pair(ScopeHandle<>(nullptr), ScopeHandle<>(nullptr));
+	}
+
+	auto ResumeThread(ScopeHandle<> hThread) {
+		::ResumeThread(hThread);
 	}
 
 	auto resumeThread(const ScopeHandle<>& threadHandle)
 		-> bool
 	{
-		return threadHandle && (ResumeThread(threadHandle) != static_cast<DWORD>(-1));
+		//return threadHandle && (ResumeThread(threadHandle) != static_cast<DWORD>(-1));
 	}
 
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)
 		-> std::unique_ptr<std::pair<IMAGE_DOS_HEADER, IMAGE_NT_HEADERS>>
 	{
-		if (!ProcessHandle || !BaseAddress)
+		if (!ProcessHandle || !BaseAddress) {
 			return nullptr;
+		}
 
 		auto FileHeader = std::make_unique<std::pair<IMAGE_DOS_HEADER, IMAGE_NT_HEADERS>>();
 
