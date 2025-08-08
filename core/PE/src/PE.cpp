@@ -19,14 +19,10 @@ namespace Mortis::PE {
 		return ret ? make_pair(ScopeHandle<>(pi.hProcess), ScopeHandle<>(pi.hThread)) : make_pair(ScopeHandle<>(nullptr), ScopeHandle<>(nullptr));
 	}
 
-	auto ResumeThread(ScopeHandle<> hThread) {
-		::ResumeThread(hThread);
-	}
-
 	auto resumeThread(const ScopeHandle<>& threadHandle)
 		-> bool
 	{
-		//return threadHandle && (ResumeThread(threadHandle) != static_cast<DWORD>(-1));
+		return threadHandle && (ResumeThread(threadHandle) != static_cast<DWORD>(-1));
 	}
 
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)

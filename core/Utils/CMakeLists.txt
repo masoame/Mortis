@@ -6,6 +6,8 @@ file(GLOB UtilsSourceFiles
 	${CMAKE_CURRENT_SOURCE_DIR}/src/tools/*.cpp
 )
 
+find_package(Boost ${BOOST_VERSION} REQUIRED COMPONENTS program_options)
+
 add_library(${PROJECT_NAME} STATIC ${UtilsSourceFiles})
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
@@ -20,6 +22,7 @@ target_precompile_headers(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} 
 	spdlog
+	#Boost::boost
 )
 
 
