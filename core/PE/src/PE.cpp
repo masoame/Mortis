@@ -1,8 +1,8 @@
 #include "PE.hpp"
 
 
-namespace Mortis::PE {
-
+namespace Mortis::PE 
+{
 	auto OpenThreadHandle(DWORD dwThreadId, DWORD dwDesiredAccess, BOOL bInheritHandle)
 		-> ScopeHandle<> 
 	{
@@ -19,14 +19,8 @@ namespace Mortis::PE {
 		return ret ? make_pair(ScopeHandle<>(pi.hProcess), ScopeHandle<>(pi.hThread)) : make_pair(ScopeHandle<>(nullptr), ScopeHandle<>(nullptr));
 	}
 
-	auto ResumeThread(ScopeHandle<> hThread) {
+	auto ResumeThread(const ScopeHandle<>& hThread) {
 		::ResumeThread(hThread);
-	}
-
-	auto resumeThread(const ScopeHandle<>& threadHandle)
-		-> bool
-	{
-		//return threadHandle && (ResumeThread(threadHandle) != static_cast<DWORD>(-1));
 	}
 
 	auto GetFileHeader(HANDLE ProcessHandle, HMODULE BaseAddress)
