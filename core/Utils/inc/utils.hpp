@@ -42,6 +42,7 @@
 #include<base_api.hpp>
 #include<base_types.hpp>
 
+#include<ThreadPool.hpp>
 #include<ReflFunc.hpp>
 #include<ConvertString.hpp>
 #include<ScopeHandle.hpp>
