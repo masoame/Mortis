@@ -15,7 +15,7 @@ namespace Mortis
 	};
 
 	template<typename HandleType, typename DeleteFunc>
-		requires ScopeHandleConcept<HandleType, DeleteFunc>
+		requires ScopeHandleConcept<std::conditional_t<std::is_void_v<HandleType>, void*, HandleType>, DeleteFunc>
 	struct ScopeHandleWrapper;
 
 	template<class HandleType, class DeleteFunc>
@@ -91,8 +91,9 @@ namespace Mortis
 	template<class HandleType = HANDLE, class DeleteFunc = BT::StaticFunctorWrapper<CloseHandle>>
 	class ScopeHandle;
 
+
 	template<typename HandleType, typename DeleteFunc>
-		requires ScopeHandleConcept<HandleType, DeleteFunc>
+		requires ScopeHandleConcept<std::conditional_t<std::is_void_v<HandleType>, void*, HandleType>, DeleteFunc>
 	struct ScopeHandleWrapper
 	{
 		constexpr static bool isPtr = std::is_pointer_v<HandleType>;
