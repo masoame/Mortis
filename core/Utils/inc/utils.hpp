@@ -36,6 +36,7 @@
 
 
 #include<spdlog/spdlog.h>
+#include<nlohmann/json.hpp>
 
 
 #include<base_concept.hpp>
