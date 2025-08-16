@@ -1,5 +1,6 @@
 #include <ThreadPool.hpp>
 
+using namespace Mortis;
 // the constructor just launches some amount of workers
 ThreadPool::ThreadPool(size_t threads)
 {

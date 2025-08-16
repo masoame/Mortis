@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} STATIC ${UtilsSourceFiles})
 target_include_directories(${PROJECT_NAME} PUBLIC 
 	${CMAKE_CURRENT_SOURCE_DIR}/inc
 	${CMAKE_CURRENT_SOURCE_DIR}/inc/tools
+	${CMAKE_CURRENT_SOURCE_DIR}/inc/tools/ThreadSafe
 )
 
 target_precompile_headers(${PROJECT_NAME} 

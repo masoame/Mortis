@@ -6,9 +6,9 @@ namespace Mortis
 	template<class T>
 	class bounded_queue
 	{
-		using Type = std::remove_reference_t<T>;
+		using Type = std::decay_t<T>;
 	public:
-		bounded_queue(std::size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
+		explicit bounded_queue(std::size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
 
 		~bounded_queue() noexcept {
 			_is_closed = true;
@@ -32,19 +32,7 @@ namespace Mortis
 			return;
 		}
 
-		void push(Type&& value) noexcept {
-			std::unique_lock lock(_mtx);
-			_cv_could_push.wait(lock, 
-				[this] { 
-					return (_queue.size() < this->_max_size) || _is_closed; 
-				});
 
-			if (_is_closed) {
-				return;
-			}
-			_queue.push_back(std::move(value));
-			_cv_could_pop.notify_one();
-		}
 
 		void push(const Type& value) noexcept {
 			std::unique_lock lock(_mtx);
