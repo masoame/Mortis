@@ -3,27 +3,27 @@
 
 namespace Mortis
 {
-	template<class T>
+	/*
+	* BoundedQueue用于实现一个有界队列，支持线程安全的入队和出队操作。内部资源都是通过智能指针管理，支持自定义的删除函数。
+	*/
+	template<class _T>
 	class bounded_queue
 	{
-		using Type = std::decay_t<T>;
+		using _Type = std::remove_reference_t<_T>;
 	public:
-		explicit bounded_queue(std::size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
+		explicit bounded_queue(size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
 
-		~bounded_queue() noexcept {
+		~bounded_queue() {
 			_is_closed = true;
 			_cv_could_push.notify_all();
 			_cv_could_pop.notify_all();
 		}
 
 		template<typename... Args>
-		void emplace(Args&&... args) {
+		void emplace(Args&&... args) noexcept
+		{
 			std::unique_lock lock(_mtx);
-			_cv_could_push.wait(lock, 
-				[this] { 
-					return (_queue.size() < this->_max_size) || _is_closed; 
-				});
-
+			_cv_could_push.wait(lock, [this] { return (_queue.size() < this->_max_size) || _is_closed; });
 			if (_is_closed) {
 				return;
 			}
@@ -32,15 +32,21 @@ namespace Mortis
 			return;
 		}
 
-
-
-		void push(const Type& value) noexcept {
+		void push(_Type&& value) noexcept
+		{
 			std::unique_lock lock(_mtx);
-			_cv_could_push.wait(lock, 
-				[this] { 
-					return (_queue.size() < this->_max_size) || _is_closed; 
-				});
+			_cv_could_push.wait(lock, [this] { return (_queue.size() < this->_max_size) || _is_closed; });
+			if (_is_closed) {
+				return;
+			}
+			_queue.push_back(std::move(value));
+			_cv_could_pop.notify_one();
+		}
 
+		void push(const _Type& value) noexcept
+		{
+			std::unique_lock lock(_mtx);
+			_cv_could_push.wait(lock, [this] { return (_queue.size() < this->_max_size) || _is_closed; });
 			if (_is_closed) {
 				return;
 			}
@@ -48,61 +54,67 @@ namespace Mortis
 			_cv_could_pop.notify_one();
 		}
 
-		std::optional<Type> pop() noexcept {
+		std::optional<_Type> pop() noexcept
+		{
 			std::unique_lock lock(_mtx);
-			_cv_could_pop.wait(lock, 
-				[this] { 
-					return (this->_queue.empty() == false) || _is_closed; 
-				});
-
+			_cv_could_pop.wait(lock, [this] { return (this->_queue.empty() == false) || _is_closed; });
 			if (_is_closed) {
 				return std::nullopt;
 			}
-			Type _ret{ std::move(_queue.front()) };
+			_Type _ret{ std::move(_queue.front()) };
 			_queue.pop_front();
 			_cv_could_push.notify_one();
 			return _ret;
 		}
 
 		template <class _Rep, class _Period>
-		std::optional<Type> pop_for(const std::chrono::duration<_Rep, _Period>& _Rel_time) noexcept{
+		std::optional<_Type> pop_for(const std::chrono::duration<_Rep, _Period>& _Rel_time) noexcept
+		{
 			std::unique_lock lock(_mtx);
-			bool cv_status = _cv_could_pop.wait_for(lock, _Rel_time, 
-				[this] { 
-					return (this->_queue.empty() == false) || _is_closed; 
-				});
-
+			bool cv_status = _cv_could_pop.wait_for(lock, _Rel_time, [this] { return (this->_queue.empty() == false) || _is_closed; });
 			if (_is_closed || !cv_status) {
 				return std::nullopt;
 			}
-			Type _ret{ std::move(_queue.front()) };
+			_Type _ret{ std::move(_queue.front()) };
 			_queue.pop_front();
 			_cv_could_push.notify_one();
 			return _ret;
 		}
 
-		inline size_t size() const noexcept{
+		inline size_t size() const noexcept
+		{
 			return _queue.size();
 		}
 
-		inline bool empty() const noexcept{
+		inline bool empty() const noexcept
+		{
 			return _queue.empty();
 		}
 
-		inline bool full() const noexcept{
+		inline bool full() const noexcept
+		{
 			return _queue.size() >= _max_size;
 		}
 
-		void clear() noexcept{
-			std::unique_lock lock(_mtx);
+		inline void lock() noexcept
+		{
+			_mtx.lock();
+		}
+
+		inline void unlock() noexcept
+		{
+			_mtx.unlock();
+		}
+
+		void clear() noexcept
+		{
 			_queue.clear();
 		}
-		std::mutex _mtx;
 		bool _is_closed = true;
 		std::condition_variable _cv_could_push, _cv_could_pop;
+		std::mutex _mtx;
 	private:
-
-		std::deque<Type> _queue;
+		std::deque<_Type> _queue;
 		const size_t _max_size;
 	};
 }
