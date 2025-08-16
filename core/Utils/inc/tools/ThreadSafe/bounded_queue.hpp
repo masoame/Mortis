@@ -98,9 +98,10 @@ namespace Mortis
 			_queue.clear();
 		}
 		std::mutex _mtx;
-	private:
 		bool _is_closed = true;
 		std::condition_variable _cv_could_push, _cv_could_pop;
+	private:
+
 		std::deque<Type> _queue;
 		const size_t _max_size;
 	};
