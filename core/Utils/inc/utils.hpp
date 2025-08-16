@@ -1,12 +1,14 @@
 #pragma once
 
 #ifdef _WIN32
+#include <Winsock2.h>
+//#include<boost/process.hpp>
 #include<Windows.h>
 #include<tlhelp32.h>
-//#include <Det>
 #else
-
 #endif
+
+
 
 #include<mutex>
 #include<deque>

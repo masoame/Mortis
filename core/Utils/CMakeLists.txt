@@ -18,7 +18,7 @@ target_precompile_headers(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/inc/utils.hpp
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME} PUBLIC
 	spdlog
 	nlohmann_json
 )

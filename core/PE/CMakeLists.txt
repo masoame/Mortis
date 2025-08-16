@@ -20,7 +20,7 @@ target_precompile_headers(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/inc/PE.h
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
 	Utils
 )
 
