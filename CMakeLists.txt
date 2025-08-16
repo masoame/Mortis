@@ -7,6 +7,6 @@ include(CMake_pkg.cmake)
 
 add_subdirectory(core)
 add_subdirectory(export) 
-#add_subdirectory(test) 
+add_subdirectory(test) 
 
 

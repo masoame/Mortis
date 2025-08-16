@@ -7,6 +7,7 @@ file(GLOB UtilsSourceFiles
 )
 
 add_library(${PROJECT_NAME} STATIC ${UtilsSourceFiles})
+add_library(Mortis::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
 	${CMAKE_CURRENT_SOURCE_DIR}/inc

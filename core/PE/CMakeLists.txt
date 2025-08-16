@@ -6,6 +6,8 @@ file(GLOB SRC_SOURCES
 )
 
 add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES} "inc/tools/ReflFuncResult.h")
+add_library(Mortis::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
 	${CMAKE_CURRENT_SOURCE_DIR}/inc
@@ -21,7 +23,7 @@ target_precompile_headers(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-	Utils
+	Mortis::Utils
 )
 
 
