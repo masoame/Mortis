@@ -1,21 +1,38 @@
 #include<PE.h>
-#include<iostream>
-using namespace Mortis;
-using namespace Mortis::PE;
+//#include<iostream>
+//using namespace Mortis;
+//using namespace Mortis::PE;
 
+ char encrypted_flag[] =
+{
+  0xCC, 0xD7, 0xAD, 0xCD, 0xC0, 0xB5, 0x9C, 0x83, 0x86, 0x9F,
+  0xE3, 0xA1, 0xDE, 0xCE, 0xA9, 0xD8, 0x83, 0xBA, 0xCC, 0x88,
+  0x8A, 0xE9, 0xEA, 0x95, 0xE8, 0xFC, 0xA8, 0xEF, 0xC9, 0xA8,
+  0x9C, 0xCA, 0x84, 0xCC, 0xF5, 0xFF, 0xF8, 0xC6, 0x00
+};
 
+char keys[] =
+ {
+   0xAA, 0xBB, 0xCC
+ };
+
+void xor_decrypt_multikey(
+	char* key,
+	char* a2,
+	unsigned __int64 size,
+	char* key2,
+	unsigned __int64 a5)
+{
+	unsigned __int64 i; 
+
+	for (i = 0i64; i < size; ++i)
+		a2[i] = key2[i % a5] ^ key[i];
+	a2[size] = 0;
+}
 int main() {
+	char RESULT[260] = "8XxN26Fhy5AScQRj";
+	xor_decrypt_multikey(encrypted_flag, RESULT, 46, keys, 3);
 
-	std::string_view test_name = "测试程序";
-	std::ofstream test_file(L"test.txt", std::ios::binary);
-	if (!test_file) {
-		std::cerr << "Failed to create file: " << test_name << std::endl;
-		return 1;
-	}
-	test_file.write(test_name.data(), test_name.size());
-	test_file.close();
-
-
-
+	printf(RESULT);
 	return 0;
 }
