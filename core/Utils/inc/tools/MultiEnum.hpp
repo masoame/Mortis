@@ -5,6 +5,9 @@ template<typename EnumType, std::enable_if<std::is_enum_v<EnumType>>>
 class MultiEnum
 {
 	EnumType _value;
+	MultiEnum() = default;
+	MultiEnum(const MultiEnum &) = default;
+
 	MultiEnum(EnumType value = EnumType())
 		: _value(value) 
 	{}
