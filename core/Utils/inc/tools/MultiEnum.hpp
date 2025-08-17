@@ -3,9 +3,10 @@
 
 namespace Mortis {
 
-	template<typename EnumType, std::enable_if<std::is_enum_v<EnumType>>>
+	template<typename EnumType>
 	class MultiEnum
 	{
+		static_assert(std::is_enum_v<EnumType>);
 		EnumType _value;
 	public:
 		MultiEnum() = default;
