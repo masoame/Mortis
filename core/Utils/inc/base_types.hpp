@@ -60,10 +60,9 @@ namespace Mortis
 
 	};
 
-	template<typename T>
+	template<typename T = void>
 	using Expected = std::expected<T, std::string_view>;
 
-	using Expected_void = Expected<void>;
 	using Expected_bool = Expected<bool>;
 
 	using UnExpected = std::unexpected<std::string_view>;
