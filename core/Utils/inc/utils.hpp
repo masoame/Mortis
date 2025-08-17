@@ -34,10 +34,8 @@
 #include<filesystem>
 #include<expected>
 
-
 #include<spdlog/spdlog.h>
 #include<nlohmann/json.hpp>
-
 
 #include<base_concept.hpp>
 #include<base_api.hpp>
