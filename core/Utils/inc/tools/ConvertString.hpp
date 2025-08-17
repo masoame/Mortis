@@ -1,6 +1,5 @@
 #pragma once
 #include<utils.hpp>
-#include<string_view>
 namespace Mortis
 {
 	inline std::wstring MultiStringToWideString(UINT CodePage, std::string_view str)
