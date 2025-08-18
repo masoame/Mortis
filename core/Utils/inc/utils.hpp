@@ -45,6 +45,7 @@
 #include<base_api.hpp>
 #include<base_types.hpp>
 
+#include<Singleton.hpp>
 #include<ThreadPool.hpp>
 #include<ReflFunc.hpp>
 #include<ConvertString.hpp>
