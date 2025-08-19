@@ -21,8 +21,9 @@ target_precompile_headers(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-	spdlog::spdlog
 	nlohmann_json
+	PRIVATE 
+	spdlog::spdlog
 )
 
 
