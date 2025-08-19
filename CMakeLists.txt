@@ -6,6 +6,7 @@ include(CMake_cfg.cmake)
 include(CMake_pkg.cmake)
 
 add_subdirectory(core)
+add_subdirectory(gui)
 add_subdirectory(export) 
 add_subdirectory(test) 
 
