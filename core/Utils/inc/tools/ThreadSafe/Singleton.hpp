@@ -6,7 +6,7 @@ namespace Mortis
 	template<typename Object>
 	class Singleton 
 	{
-	private:
+	protected:
 		Singleton() = default;
 		Singleton(const Singleton&) = delete;
 		Singleton& operator=(const Singleton&) = delete;
