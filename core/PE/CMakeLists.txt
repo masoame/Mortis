@@ -24,8 +24,6 @@ target_precompile_headers(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
 	Mortis::Utils
-PRIVATE 
-	spdlog::spdlog
 )
 
 
