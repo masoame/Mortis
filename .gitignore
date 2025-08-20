@@ -365,5 +365,6 @@ FodyWeavers.xsd
 CMakePresets.json
 CMakeUserPresets.json
 CMakeSettings.json
-/test/build-Mortis/test.txt
+
 gui/imgui-*
+test/build-Mortis/test.txt
