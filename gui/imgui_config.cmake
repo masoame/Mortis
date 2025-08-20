@@ -25,6 +25,8 @@ add_library(${PROJECT_NAME} STATIC
     ${CPP_FILES} 
     ${BACKENDS_FILES}
 )
+add_library(Mortis::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${IMGUI_PATH}
