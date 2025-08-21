@@ -14,7 +14,8 @@ if(NOT IMGUI_PATH)
 endif()
 
 file(GLOB CPP_FILES 
-    ${IMGUI_PATH}/*.cpp)
+    ${IMGUI_PATH}/*.cpp
+)
 
 file(GLOB BACKENDS_FILES 
     ${IMGUI_PATH}/backends/imgui_impl_win32.cpp
