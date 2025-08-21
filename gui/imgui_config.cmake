@@ -1,6 +1,12 @@
 project(imgui)
 
-file(GLOB IMGUI_PATH ${CMAKE_CURRENT_LIST_DIR}/imgui-*)
+file(GLOB IMGUI_PATHS ${CMAKE_CURRENT_LIST_DIR}/imgui*)
+list(FILTER IMGUI_PATHS EXCLUDE REGEX "docking")
+list(FILTER IMGUI_PATHS EXCLUDE REGEX "\\.cmake$")
+
+if(IMGUI_PATHS)
+    list(GET IMGUI_PATHS 0 IMGUI_PATH)
+endif()
 
 if(NOT IMGUI_PATH)
     file(DOWNLOAD 
@@ -10,7 +16,10 @@ if(NOT IMGUI_PATH)
     execute_process(COMMAND 
         tar -xzvf imgui.zip -C ${CMAKE_CURRENT_LIST_DIR}
     )
-    file(GLOB IMGUI_PATH ${CMAKE_CURRENT_LIST_DIR}/imgui*)
+    file(GLOB IMGUI_PATHS ${CMAKE_CURRENT_LIST_DIR}/imgui*)
+    list(FILTER IMGUI_PATHS EXCLUDE REGEX "docking")
+    list(FILTER IMGUI_PATHS EXCLUDE REGEX "\\.cmake$")
+    list(GET IMGUI_PATHS 0 IMGUI_PATH)
 endif()
 
 file(GLOB CPP_FILES 

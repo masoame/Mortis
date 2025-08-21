@@ -25,6 +25,6 @@ class D : public Mortis::Singleton<D> {
 int main() {
 	
 	A a;
-
+	a;
 	return 0;
 }

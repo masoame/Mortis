@@ -12,7 +12,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 
-target_compile_options(main PRIVATE
-    $<$<COMPILE_LANGUAGE:CXX>:/W0 /WX->
-    $<$<COMPILE_LANGUAGE:C>:/W0 /WX->
-)
+#target_compile_options(main PRIVATE
+#    $<$<COMPILE_LANGUAGE:CXX>:/W0 /WX->
+#    $<$<COMPILE_LANGUAGE:C>:/W0 /WX->
+#)

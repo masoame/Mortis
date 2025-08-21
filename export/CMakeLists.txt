@@ -8,6 +8,7 @@ target_link_libraries(MortisLib INTERFACE
 	Mortis::PE
 	Mortis::SysIntVecDbg
 	Mortis::imgui
+	Mortis::imgui-docking
 )
 
 
