@@ -43,10 +43,4 @@ endif()
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 
-#if(WIN32)
-#set(CMAKE_GENERATOR_TOOLSET "v143_xp" CACHE STRING "Toolset for Win7" FORCE)
-#set(CMAKE_SYSTEM_VERSION "8.1" CACHE STRING "Windows SDK version")  # 用 8.1 SDK 确保兼容
-#endif()
-
 set(CMAKE_CXX_STANDARD 26)
-
