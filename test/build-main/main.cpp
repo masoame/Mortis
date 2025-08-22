@@ -1,30 +1,29 @@
 #include<PE.h>
 #include<iostream>
 
-template<class Object>
-class CrtpBase {
-	protected:
-	CrtpBase() = default;
-
-
-};
-class A : public CrtpBase<A>
-{
-public:
-	A() = default;
-};
-
-
-class C : public Mortis::Singleton<C> {
-
-};
-class D : public Mortis::Singleton<D> {
-
-};
-
 int main() {
 	
-	A a;
-	a;
-	return 0;
+	int num = 0;
+	std::cin >> num;
+
+	try{
+		switch (num)
+		{
+		case 0:
+			throw std::runtime_error("test error");
+		case 1:
+			throw 67;
+		case 2: 
+			throw "test c style error";
+
+		default:
+			break;
+		}
+	}
+	catch (const std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
+	catch (...) {
+		std::cout << std::current_exception().operator bool() << std::endl;
+	}
 }

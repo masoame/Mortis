@@ -1,25 +1,16 @@
 project(imgui)
 
-file(GLOB IMGUI_PATHS ${CMAKE_CURRENT_LIST_DIR}/imgui*)
-list(FILTER IMGUI_PATHS EXCLUDE REGEX "docking")
-list(FILTER IMGUI_PATHS EXCLUDE REGEX "\\.cmake$")
-
-if(IMGUI_PATHS)
-    list(GET IMGUI_PATHS 0 IMGUI_PATH)
-endif()
+file(GLOB IMGUI_PATH ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-*-docking)
 
 if(NOT IMGUI_PATH)
     file(DOWNLOAD 
-        https://github.com/ocornut/imgui/archive/refs/tags/v1.92.2b.zip
-        imgui.zip
+        https://github.com/ocornut/imgui/archive/refs/tags/v1.92.2b-docking.zip
+        imgui-docking.zip
     )
     execute_process(COMMAND 
-        tar -xzvf imgui.zip -C ${CMAKE_CURRENT_LIST_DIR}
+        tar -xzvf imgui-docking.zip -C ${CMAKE_CURRENT_BINARY_DIR}/_deps
     )
-    file(GLOB IMGUI_PATHS ${CMAKE_CURRENT_LIST_DIR}/imgui*)
-    list(FILTER IMGUI_PATHS EXCLUDE REGEX "docking")
-    list(FILTER IMGUI_PATHS EXCLUDE REGEX "\\.cmake$")
-    list(GET IMGUI_PATHS 0 IMGUI_PATH)
+    file(GLOB IMGUI_PATH ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-*-docking)
 endif()
 
 file(GLOB CPP_FILES 
@@ -47,4 +38,3 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     d3d11 
 	dxgi
 )
-

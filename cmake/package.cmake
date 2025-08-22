@@ -1,7 +1,17 @@
+if(NOT USING_BOOST)
+    set(USING_BOOST off)
+endif()
 
-set(BOOST_OPTION OFF)
-set(BOOST_ROOT "C:/Env/boost")
-set(BOOST_VERSION "1.88.0")
+if(NOT USING_IMGUI)
+    set(USING_IMGUI off)
+endif()
+
+if(NOT IMGUI_DOCKING_OPTION)
+    set(IMGUI_DOCKING_OPTION off)
+endif()
+
+include(${CMAKE_CURRENT_LIST_DIR}/manual_import/import_boost.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/manual_import/import_imgui.cmake)
 
 set(ENV{http_proxy} "http://127.0.0.1:10808")
 set(ENV{https_proxy} "http://127.0.0.1:10808")
@@ -23,4 +33,3 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(spdlog)
-
