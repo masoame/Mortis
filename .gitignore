@@ -366,5 +366,5 @@ CMakePresets.json
 CMakeUserPresets.json
 CMakeSettings.json
 
-gui/imgui-*
+gui/imgui-*/
 test/build-Mortis/test.txt
