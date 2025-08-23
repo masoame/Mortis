@@ -1,8 +1,4 @@
 
-message(------------------${CMAKE_CURRENT_SOURCE_DIR})
-message(------------------${CMAKE_CURRENT_LIST_DIR})
-message(------------------${CMAKE_CURRENT_BINARY_DIR})
-
 if(USING_IMGUI)
 	if(IMGUI_DOCKING_OPTION)
 		include(${CMAKE_CURRENT_LIST_DIR}/imgui_option/imgui-docking_config.cmake)
