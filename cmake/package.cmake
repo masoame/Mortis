@@ -27,4 +27,4 @@ if(NOT IMGUI_DOCKING_OPTION)
     set(IMGUI_DOCKING_OPTION off)
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/manual_import/import_imgui.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/thirdparty/import_imgui.cmake)
