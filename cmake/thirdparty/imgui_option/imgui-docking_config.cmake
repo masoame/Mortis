@@ -1,6 +1,6 @@
 project(imgui)
 
-file(GLOB IMGUI_PATH ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-*-docking)
+file(GLOB IMGUI_PATH ${CMAKE_BINARY_DIR}/_deps/imgui-*-docking)
 
 if(NOT IMGUI_PATH)
     file(DOWNLOAD 
@@ -8,9 +8,9 @@ if(NOT IMGUI_PATH)
         imgui-docking.zip
     )
     execute_process(COMMAND 
-        tar -xzvf imgui-docking.zip -C ${CMAKE_CURRENT_BINARY_DIR}/_deps
+        tar -xzvf imgui-docking.zip -C ${CMAKE_BINARY_DIR}/_deps
     )
-    file(GLOB IMGUI_PATH ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui-*-docking)
+    file(GLOB IMGUI_PATH ${CMAKE_BINARY_DIR}/_deps/imgui-*-docking)
 endif()
 
 file(GLOB CPP_FILES 
