@@ -1,6 +1,6 @@
 project(imgui)
 
-file(GLOB IMGUI_PATHS ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui*)
+file(GLOB IMGUI_PATHS ${CMAKE_BINARY_DIR}/_deps/imgui*)
 list(FILTER IMGUI_PATHS EXCLUDE REGEX "docking")
 
 if(IMGUI_PATHS)
@@ -13,9 +13,9 @@ if(NOT IMGUI_PATH)
         imgui.zip
     )
     execute_process(COMMAND 
-        tar -xzvf imgui.zip -C ${CMAKE_CURRENT_BINARY_DIR}/_deps
+        tar -xzvf imgui.zip -C ${CMAKE_BINARY_DIR}/_deps
     )
-    file(GLOB IMGUI_PATHS ${CMAKE_CURRENT_BINARY_DIR}/_deps/imgui*)
+    file(GLOB IMGUI_PATHS ${CMAKE_BINARY_DIR}/_deps/imgui*)
     list(FILTER IMGUI_PATHS EXCLUDE REGEX "docking")
     list(GET IMGUI_PATHS 0 IMGUI_PATH)
 endif()

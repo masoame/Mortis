@@ -11,7 +11,7 @@ namespace Mortis
 	{
 		using _Type = std::remove_reference_t<_T>;
 	public:
-		explicit bounded_queue(size_t max_size = ULLONG_MAX) : _max_size(max_size), _is_closed(false) {}
+		explicit bounded_queue(size_t max_size = -1) : _max_size(max_size), _is_closed(false) {}
 
 		~bounded_queue() {
 			_is_closed = true;
