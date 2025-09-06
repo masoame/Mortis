@@ -44,6 +44,7 @@
 #include<base_concept.hpp>
 #include<base_api.hpp>
 #include<base_types.hpp>
+#include<EnumWrapper.hpp>
 
 #include<Singleton.hpp>
 #include<ThreadPool.hpp>
