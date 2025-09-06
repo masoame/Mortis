@@ -81,7 +81,7 @@ namespace Mortis
 			return _ret;
 		}
 
-		constexpr void setMaxSize(size_t new_size) noexcept
+		constexpr void setMaxSize(size_t new_size) noexcept 
 		{
 			std::unique_lock lock(_mtx);
 			if (_queue.size() > new_size) {
@@ -125,6 +125,6 @@ namespace Mortis
 		std::mutex _mtx;
 	private:
 		std::deque<_Type> _queue;
-		const size_t _max_size;
+		mutable std::size_t _max_size;
 	};
 }
