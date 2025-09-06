@@ -81,7 +81,7 @@ namespace Mortis
 			return _ret;
 		}
 
-		constexpr void resize(size_t new_size) noexcept
+		constexpr void setMaxSize(size_t new_size) noexcept
 		{
 			std::unique_lock lock(_mtx);
 			if (_queue.size() > new_size) {
