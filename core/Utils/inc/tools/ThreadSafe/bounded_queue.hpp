@@ -81,32 +81,42 @@ namespace Mortis
 			return _ret;
 		}
 
-		inline size_t size() const noexcept
+		constexpr void setMaxSize(size_t new_size) noexcept 
+		{
+			std::unique_lock lock(_mtx);
+			if (_queue.size() > new_size) {
+				_queue.resize(new_size);
+			}
+			_max_size = new_size;
+			_cv_could_push.notify_all();
+		}
+
+		constexpr size_t size() const noexcept
 		{
 			return _queue.size();
 		}
 
-		inline bool empty() const noexcept
+		constexpr bool empty() const noexcept
 		{
 			return _queue.empty();
 		}
 
-		inline bool full() const noexcept
+		constexpr bool full() const noexcept
 		{
 			return _queue.size() >= _max_size;
 		}
 
-		inline void lock() noexcept
+		constexpr void lock() noexcept
 		{
 			_mtx.lock();
 		}
 
-		inline void unlock() noexcept
+		constexpr void unlock() noexcept
 		{
 			_mtx.unlock();
 		}
 
-		void clear() noexcept
+		constexpr void clear() noexcept
 		{
 			_queue.clear();
 		}
@@ -115,6 +125,6 @@ namespace Mortis
 		std::mutex _mtx;
 	private:
 		std::deque<_Type> _queue;
-		const size_t _max_size;
+		mutable std::size_t _max_size;
 	};
 }
