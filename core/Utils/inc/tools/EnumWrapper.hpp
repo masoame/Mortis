@@ -32,13 +32,12 @@ namespace Mortis
 		constexpr const Interger& get() const {
 			return _flags;
 		}
-
 	};
 
 	template<typename T>
 	class FlagEdit : public FlagView<T> 
 	{
-		FlagView<T>::Interger& _flags;
+		FlagView<T>::Interger _flags;
 
 		FlagEdit(FlagView<T>::Interger& flags) : FlagView(flags),_flags(flags) { }
 
