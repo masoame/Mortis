@@ -4,9 +4,6 @@
 namespace Mortis
 {
 	template<typename T>
-	concept ConEnum = std::is_enum_v<T>;
-
-	template<typename T>
 	concept ConEnumFlag = std::is_enum_v<T>;
 
 	template<ConEnumFlag T>
@@ -36,12 +33,12 @@ namespace Mortis
 	};
 
 	template<typename T>
-	class FlagEdit : public FlagView<T> 
+	class FlagEdit : public FlagView<T>
 	{
 		FlagView<T>::Interger _flags;
 	public:
-		FlagEdit() : FlagView(_flags), _flags(0) {}
-		FlagEdit(const FlagView<T>::Interger& flags) : FlagView(_flags),_flags(flags) {}
+		FlagEdit() : FlagView<T>(_flags), _flags(0) {}
+		FlagEdit(const FlagView<T>::Interger& flags) : FlagView<T>(_flags), _flags(flags) {}
 
 		constexpr void erase(const FlagView<T>::Interger& flags) {
 			_flags &= ~flags;
@@ -52,4 +49,3 @@ namespace Mortis
 		}
 	};
 }
-
