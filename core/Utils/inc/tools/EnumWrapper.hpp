@@ -41,7 +41,7 @@ namespace Mortis
 		FlagView<T>::Interger _flags;
 
 		FlagEdit() : FlagView(_flags), _flags(0) {}
-		FlagEdit(FlagView<T>::Interger& flags) : FlagView(_flags),_flags(flags) {}
+		FlagEdit(const FlagView<T>::Interger& flags) : FlagView(_flags),_flags(flags) {}
 
 		constexpr void erase(const FlagView<T>::Interger& flags) {
 			_flags &= ~flags;
