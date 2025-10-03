@@ -9,9 +9,10 @@ namespace Mortis
 	template<typename T>
 	concept ConEnumFlag = std::is_enum_v<T>;
 
-	template<ConEnumFlag T, typename Interger = std::underlying_type_t<T>>
+	template<ConEnumFlag T>
 	class FlagView
 	{
+		using Interger = std::underlying_type_t<T>;
 	public:
 		const Interger& _flags;
 	public:
