@@ -35,6 +35,7 @@ namespace Mortis
 	template<typename T>
 	class FlagEdit : public FlagView<T>
 	{
+	protected:
 		FlagView<T>::Interger _flags;
 	public:
 		FlagEdit() : FlagView<T>(_flags), _flags(0) {}
