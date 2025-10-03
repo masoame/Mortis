@@ -18,7 +18,7 @@ namespace Mortis
 	public:
 		FlagView(const Interger& flags) : _flags(flags) {}
 
-		constexpr bool has(const Interger& flags) const {
+		constexpr bool contains(const Interger& flags) const {
 			return _flags & flags;
 		}
 
