@@ -39,7 +39,7 @@ namespace Mortis
 	class FlagEdit : public FlagView<T> 
 	{
 		FlagView<T>::Interger _flags;
-
+	public:
 		FlagEdit() : FlagView(_flags), _flags(0) {}
 		FlagEdit(const FlagView<T>::Interger& flags) : FlagView(_flags),_flags(flags) {}
 
