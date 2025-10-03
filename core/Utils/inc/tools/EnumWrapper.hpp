@@ -12,8 +12,8 @@ namespace Mortis
 	template<ConEnumFlag T>
 	class FlagView
 	{
+	protected:
 		using Interger = std::underlying_type_t<T>;
-	public:
 		const Interger& _flags;
 	public:
 		FlagView(const Interger& flags) : _flags(flags) {}
