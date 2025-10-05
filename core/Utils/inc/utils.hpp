@@ -37,9 +37,10 @@
 #include<mutex>
 #include<future>
 
-
 #include<spdlog/spdlog.h>
 #include<nlohmann/json.hpp>
+#include <magic_enum/magic_enum.hpp>
+#include <blockingconcurrentqueue.h>
 
 #include<base_concept.hpp>
 #include<base_api.hpp>

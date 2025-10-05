@@ -23,6 +23,8 @@ target_precompile_headers(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PUBLIC
 	nlohmann_json
 	spdlog::spdlog_header_only
+	magic_enum
+	concurrentqueue
 )
 
 
