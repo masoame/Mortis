@@ -1,21 +1,31 @@
 #include "Dll.hpp"
 
-BOOL APIENTRY DllMain([[maybe_unused]] HMODULE hModule, [[maybe_unused]] DWORD  ul_reason_for_call, [[maybe_unused]] LPVOID lpReserved)
+extern BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);
+
+namespace Mortis
 {
-	switch (ul_reason_for_call) 
+	class DLLMaker :public BaseDLL<DLLMaker>
 	{
-	case DLL_PROCESS_ATTACH:
-		
-		break;
-	case DLL_THREAD_ATTACH:
-
-		break;
-	case DLL_THREAD_DETACH:
-
-		break;
-	case DLL_PROCESS_DETACH:
-
-		break;
-	}
-	return TRUE;
+		friend class BaseDLL<DLLMaker>;
+		friend BOOL APIENTRY ::DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved);
+	protected:
+		bool Initialize(const HMODULE& hModule, PCONTEXT pCtx) {
+			hModule, pCtx;
+			return true;
+		}
+		bool Uninitialize(const HMODULE& hModule, PCONTEXT pCtx) {
+			hModule, pCtx;
+			return true;
+		}
+		bool Listen_Thread_Create(const HMODULE& hModule) {
+			hModule;
+			return true;
+		}
+		bool Listen_Thread_Destroy(const HMODULE& hModule) {
+			hModule;
+			return true;
+		}
+	};
 }
+
+MAKE_DLL(DLLMaker);
