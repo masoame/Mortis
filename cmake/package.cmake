@@ -31,6 +31,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(concurrentqueue)
 
+FetchContent_Declare(
+    sigslot
+    GIT_REPOSITORY  https://github.com/palacaze/sigslot.git
+    GIT_TAG v1.2.3
+)
+FetchContent_MakeAvailable(sigslot)
+
 if(NOT USING_IMGUI)
     set(USING_IMGUI on)
 endif()

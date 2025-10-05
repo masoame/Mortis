@@ -25,6 +25,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	spdlog::spdlog_header_only
 	magic_enum
 	concurrentqueue
+	sigslot
 )
 
 
