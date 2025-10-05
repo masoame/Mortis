@@ -15,7 +15,7 @@ cmake导入
 FetchContent_Declare(
     Mortis
     GIT_REPOSITORY  https://github.com/masoame/Mortis.git
-    GIT_TAG         xxx # 版本号
+    GIT_TAG         main # 版本号
 )
 FetchContent_MakeAvailable(Mortis)
 ```
