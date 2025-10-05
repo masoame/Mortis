@@ -41,6 +41,7 @@
 #include<nlohmann/json.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <blockingconcurrentqueue.h>
+#include <sigslot/signal.hpp>
 
 #include<base_concept.hpp>
 #include<base_api.hpp>

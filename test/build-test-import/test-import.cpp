@@ -1,6 +1,6 @@
 #include<utils.hpp>
 #include <sigslot/signal.hpp>
-#include <sigslot/>
+
 #include<iostream>
 
 struct foo {
