@@ -3,7 +3,7 @@ cmake_policy(SET CMP0167 NEW)
 
 add_executable(${PROJECT_NAME} ${PROJECT_NAME}.cpp)
 target_link_libraries(${PROJECT_NAME}
-	Mortis::imgui
+	Mortis::Lib
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 

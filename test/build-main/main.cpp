@@ -1,10 +1,9 @@
 #include<PE.h>
-#pragma comment(lib,"InjectDLL.lib")
 
 int main()
 {
 	{
-		LoadLibraryA("InjectDLL.dll");
+		LoadLibraryA("DLLMaker.dll");
 	}
 
 	{

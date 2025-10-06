@@ -1,4 +1,4 @@
-#include<PE.hpp>
+#include<utils.hpp>
 
 namespace Mortis
 {
@@ -23,10 +23,31 @@ namespace Mortis
 	};
 }
 
-#define MAKE_DLL(DLLClass) \
-using namespace Mortis;\
+
+//template<typename DLLMakerClass>
+//BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+//	switch (ul_reason_for_call)
+//	{
+//	case DLL_PROCESS_ATTACH:
+//		DLLMakerClass::Instance().Initialize(hModule, reinterpret_cast<PCONTEXT>(lpReserved));
+//		break; 
+//	case DLL_THREAD_ATTACH:
+//		DLLMakerClass::Instance().Listen_Thread_Create(hModule);
+//		break; 
+//	case DLL_THREAD_DETACH:
+//		DLLMakerClass::Instance().Listen_Thread_Destroy(hModule);
+//		break; 
+//	case DLL_PROCESS_DETACH:
+//		DLLMakerClass::Instance().Uninitialize(hModule, reinterpret_cast<PCONTEXT>(lpReserved));
+//		break; 
+//	}
+//		return static_cast<BOOL>(DLLClass::Instance().bRet);
+//}
+
+#define DEFAULT_MAKE_DLL(DLLClass) \
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) \
 {\
+	using namespace Mortis;\
 	switch (ul_reason_for_call)\
 	{\
 	case DLL_PROCESS_ATTACH:\
