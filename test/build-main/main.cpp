@@ -3,9 +3,9 @@
 
 int main()
 {
-	//{
-	//	LoadLibraryA("InjectDLL.dll");
-	//}
+	{
+		LoadLibraryA("InjectDLL.dll");
+	}
 
 	{
 		moodycamel::BlockingConcurrentQueue<int> q;
