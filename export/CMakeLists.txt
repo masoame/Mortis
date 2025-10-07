@@ -20,4 +20,5 @@ target_link_libraries(${PROJECT_NAME} INTERFACE
 	Mortis::PE
 	Mortis::SysIntVecDbg
 	Mortis::imgui
+	Mortis::DLLMaker
 )
