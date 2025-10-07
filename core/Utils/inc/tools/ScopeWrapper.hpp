@@ -11,7 +11,7 @@ namespace Mortis
 		ScopeVirtualMemory(const ScopeHandle<>& hProcess ,LPVOID lpAddress,SIZE_T dwSize,DWORD flAllocationType, DWORD flProtect){
 			_mem_adress = VirtualAllocEx(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
 			_scope = std::unique_ptr<void, std::function<BOOL(LPVOID)>>(_mem_adress,
-				std::bind(VirtualFreeEx, hProcess.get(), std::placeholders::_1, dwSize, flAllocationType));
+				std::bind(VirtualFreeEx, hProcess.get(), std::placeholders::_1, dwSize, MEM_RELEASE));
 		}
 		ScopeVirtualMemory(ScopeVirtualMemory&& _scope_vir_memory) {
 			_scope = std::move(_scope_vir_memory._scope);
