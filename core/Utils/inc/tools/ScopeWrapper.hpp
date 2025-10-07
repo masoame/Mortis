@@ -7,9 +7,10 @@ namespace Mortis
 	{
 		std::unique_ptr<void, std::function<BOOL(LPVOID)>> _scope;
 
+		mutable LPVOID _mem_adress = nullptr;
 		ScopeVirtualMemory(const ScopeHandle<>& hProcess ,LPVOID lpAddress,SIZE_T dwSize,DWORD flAllocationType, DWORD flProtect){
-			auto memAdress = VirtualAllocEx(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
-			_scope = std::unique_ptr<void, std::function<BOOL(LPVOID)>>(memAdress,
+			_mem_adress = VirtualAllocEx(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
+			_scope = std::unique_ptr<void, std::function<BOOL(LPVOID)>>(_mem_adress,
 				std::bind(VirtualFreeEx, hProcess.get(), std::placeholders::_1, dwSize, flAllocationType));
 		}
 		ScopeVirtualMemory(ScopeVirtualMemory&& _scope_vir_memory) {
@@ -17,6 +18,10 @@ namespace Mortis
 		}
 
 		ScopeVirtualMemory(const ScopeVirtualMemory&) = delete;
+
+		operator const LPVOID&() const {
+			return _mem_adress;
+		}
 	};
 
 	template<typename PurgeFunc, typename... Args>
