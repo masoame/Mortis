@@ -19,9 +19,6 @@ namespace Mortis
 
 		ScopeVirtualMemory(const ScopeVirtualMemory&) = delete;
 
-		operator const LPVOID&() const {
-			return _mem_adress;
-		}
 		operator LPVOID () const {
 			return _mem_adress;
 		}
