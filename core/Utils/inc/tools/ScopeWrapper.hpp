@@ -1,8 +1,24 @@
 #pragma once
-#include<base_template.hpp>
+#include<ScopeHandle.hpp>
 #include<tuple>
 namespace Mortis
 {
+	struct ScopeVirtualMemory
+	{
+		std::unique_ptr<void, std::function<BOOL(LPVOID)>> _scope;
+
+		ScopeVirtualMemory(const ScopeHandle<>& hProcess ,LPVOID lpAddress,SIZE_T dwSize,DWORD flAllocationType, DWORD flProtect){
+			auto memAdress = VirtualAllocEx(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
+			_scope = std::unique_ptr<void, std::function<BOOL(LPVOID)>>(memAdress,
+				std::bind(VirtualFreeEx, hProcess.get(), std::placeholders::_1, dwSize, flAllocationType));
+		}
+		ScopeVirtualMemory(ScopeVirtualMemory&& _scope_vir_memory) {
+			_scope = std::move(_scope_vir_memory._scope);
+		}
+
+		ScopeVirtualMemory(const ScopeVirtualMemory&) = delete;
+	};
+
 	template<typename PurgeFunc, typename... Args>
 		requires requires(PurgeFunc f, Args...args) { std::invoke(f, args...); }
 	struct ScopeExecutor
