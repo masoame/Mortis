@@ -8,8 +8,8 @@ namespace Mortis
 		std::unique_ptr<void, std::function<BOOL(LPVOID)>> _scope;
 
 		mutable LPVOID _mem_adress = nullptr;
-		ScopeVirtualMemory(const ScopeHandle<>& hProcess ,LPVOID lpAddress,SIZE_T dwSize,DWORD flAllocationType, DWORD flProtect){
-			_mem_adress = VirtualAllocEx(hProcess, lpAddress, dwSize, flAllocationType, flProtect);
+		ScopeVirtualMemory(const ScopeHandle<>& hProcess, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect) {
+			_mem_adress = VirtualAllocEx(hProcess, nullptr, dwSize, flAllocationType, flProtect);
 			_scope = std::unique_ptr<void, std::function<BOOL(LPVOID)>>(_mem_adress,
 				std::bind(VirtualFreeEx, hProcess.get(), std::placeholders::_1, dwSize, MEM_RELEASE));
 		}
