@@ -22,6 +22,9 @@ namespace Mortis
 		operator const LPVOID&() const {
 			return _mem_adress;
 		}
+		operator LPVOID () const {
+			return _mem_adress;
+		}
 	};
 
 	template<typename PurgeFunc, typename... Args>
