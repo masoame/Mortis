@@ -41,6 +41,9 @@ namespace Mortis::PE
 	auto ModuleInfo(DWORD th32ProcessID)
 		-> std::vector<MODULEENTRY32<T>>;
 
+	auto ThreadInfo(DWORD th32ProcessID)
+		-> std::vector<THREADENTRY32>;
+
 	template<typename T = char>
 	auto ModuleInfoMap(DWORD th32ProcessID, EnumInfoMapType key_type)
 		-> std::map<std::variant<HMODULE, CaseInsensitiveStdString<T>>, MODULEENTRY32<T>>;

@@ -41,5 +41,6 @@ namespace Mortis::PE
 	template<typename T>
 		requires BC::HasType<T, char, wchar_t>
 	using MODULEENTRY32 = std::conditional_t<std::is_same_v<T, char>, ::MODULEENTRY32, ::MODULEENTRY32W>;
+
 }
 

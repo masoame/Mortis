@@ -44,4 +44,24 @@ namespace Mortis::PE
 		}
 		return FileHeader;
 	}
+
+	auto ThreadInfo(DWORD th32ProcessID)
+		-> std::vector<THREADENTRY32>
+	{
+		ScopeHandle hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, th32ProcessID);
+		if (hProcessSnap == INVALID_HANDLE_VALUE) {
+			return {};
+		}
+
+		std::vector<THREADENTRY32> info{};
+		THREADENTRY32 thread_entry_cache{};
+		thread_entry_cache.dwSize = sizeof(THREADENTRY32);
+
+		BOOL bFound = Thread32First(hProcessSnap, &thread_entry_cache);
+		while (bFound) {
+			info.emplace_back(thread_entry_cache);
+			bFound = Thread32Next(hProcessSnap, &thread_entry_cache);
+		}
+		return info;
+	}
 }
