@@ -19,7 +19,6 @@
 #include<chrono>
 #include<locale>
 #include<codecvt>
-#include<ranges>
 #include<algorithm>
 #include<string>
 #include<functional>
