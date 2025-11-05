@@ -62,7 +62,6 @@ namespace Mortis::PE
 		return nullptr;
 	}
 
-
 	template<typename T>
 	auto ProcessInfo()
 		-> std::vector<PROCESSENTRY32<T>>
@@ -132,7 +131,7 @@ namespace Mortis::PE
 
 
 	template<typename T>
-	auto ModuleInfo(DWORD th32ProcessID) 
+	auto ModuleInfo(DWORD th32ProcessID)
 		-> std::vector<MODULEENTRY32<T>>
 	{
 		std::vector<MODULEENTRY32<T>> info{};

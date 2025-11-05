@@ -13,6 +13,8 @@
 #include<vector>
 #include<set>
 #include<map>
+#include <list>
+#include <ranges>
 
 #include<chrono>
 #include<locale>
@@ -37,13 +39,16 @@
 #include<mutex>
 #include<future>
 
-
 #include<spdlog/spdlog.h>
 #include<nlohmann/json.hpp>
+#include <magic_enum/magic_enum.hpp>
+#include <blockingconcurrentqueue.h>
+#include <sigslot/signal.hpp>
 
 #include<base_concept.hpp>
 #include<base_api.hpp>
 #include<base_types.hpp>
+#include<EnumWrapper.hpp>
 
 #include<Singleton.hpp>
 #include<ThreadPool.hpp>

@@ -1,9 +1,9 @@
-project(Mortis)
+project(DLLTest)
 cmake_policy(SET CMP0167 NEW)
 
-add_executable(${PROJECT_NAME} ${PROJECT_NAME}.cpp)
+add_library(${PROJECT_NAME} SHARED "${PROJECT_NAME}.cpp")
 target_link_libraries(${PROJECT_NAME}
-	Mortis::Lib
+	Mortis::DLLMaker
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 

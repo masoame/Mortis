@@ -1,5 +1,5 @@
 
-project(main LANGUAGES CXX)
+project(test-import LANGUAGES CXX)
 
 add_executable(${PROJECT_NAME} ${PROJECT_NAME}.cpp)
 

@@ -1,10 +1,10 @@
 
-project(main LANGUAGES CXX)
+project(test-PE LANGUAGES CXX)
 
 add_executable(${PROJECT_NAME} ${PROJECT_NAME}.cpp)
 
 target_link_libraries(${PROJECT_NAME} 
-	Mortis::Lib
+	Mortis::PE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 

@@ -28,6 +28,7 @@ namespace Mortis::PE::Exp
 	//导出函数地址
 	auto GetProcAddressEx(HANDLE ProcessHandle, HMODULE BaseAddress, std::string_view fcName)
 		-> FuncPtr;
+
 	template<typename FuncType>
 	auto GetProcAddressEx(HANDLE ProcessHandle, HMODULE BaseAddress, std::string_view fcName)
 		-> FuncType;
@@ -35,6 +36,7 @@ namespace Mortis::PE::Exp
 	//批量找出导出函数地址
 	auto GetProcAddressEx(const HANDLE ProcessHandle, const HMODULE BaseAddress, const std::vector<std::string_view>& fcNameGroup)
 		-> std::vector<FuncPtr>;
+
 	template <typename FuncType>
 	auto GetProcAddressEx(const HANDLE ProcessHandle, const HMODULE BaseAddress, const std::vector<std::string_view>& fcNameGroup)
 		-> std::vector<FuncType>;

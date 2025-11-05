@@ -8,7 +8,6 @@ FetchContent_Declare(
     GIT_REPOSITORY  https://github.com/nlohmann/json.git
     GIT_TAG  v3.11.3
 )
-
 FetchContent_MakeAvailable(nlohmann_json)
 
 FetchContent_Declare(
@@ -16,8 +15,28 @@ FetchContent_Declare(
     GIT_REPOSITORY  https://github.com/gabime/spdlog.git
     GIT_TAG v1.15.3
 )
-
 FetchContent_MakeAvailable(spdlog)
+
+FetchContent_Declare(
+    magic_enum
+    GIT_REPOSITORY  https://github.com/Neargye/magic_enum.git
+    GIT_TAG v0.9.7
+)
+FetchContent_MakeAvailable(magic_enum)
+
+FetchContent_Declare(
+    concurrentqueue
+    GIT_REPOSITORY  https://github.com/cameron314/concurrentqueue.git
+    GIT_TAG v1.0.4
+)
+FetchContent_MakeAvailable(concurrentqueue)
+
+FetchContent_Declare(
+    sigslot
+    GIT_REPOSITORY  https://github.com/palacaze/sigslot.git
+    GIT_TAG v1.2.3
+)
+FetchContent_MakeAvailable(sigslot)
 
 if(NOT USING_IMGUI)
     set(USING_IMGUI on)
