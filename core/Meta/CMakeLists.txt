@@ -5,7 +5,7 @@ file(GLOB SRC_SOURCES
 )
 
 add_library(${PROJECT_NAME} STATIC ${SRC_SOURCES})
-add_library(Mortis::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(Mortis::Meta ALIAS ${PROJECT_NAME})
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC 

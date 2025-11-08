@@ -5,6 +5,7 @@ add_library(Mortis::Lib ALIAS ${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} INTERFACE
 	Mortis::Utils
+	Mortis::Meta
 	Mortis::PE
 	Mortis::SysIntVecDbg
 	Mortis::imgui

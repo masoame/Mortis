@@ -1,12 +1,5 @@
 ﻿#pragma once
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#include<Windows.h>
-#include<tlhelp32.h>
-#else
-#endif
-
 #include<deque>
 #include<queue>
 #include<array>
@@ -38,8 +31,8 @@
 #include<mutex>
 #include<future>
 
-#include<spdlog/spdlog.h>
-#include<nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <blockingconcurrentqueue.h>
 #include <sigslot/signal.hpp>
@@ -57,6 +50,13 @@
 #include<ScopeWrapper.hpp>
 #include<bounded_queue.hpp>
 
+
+#ifdef _WIN32
+#include <Winsock2.h>
+#include<Windows.h>
+#include<tlhelp32.h>
+#else
+#endif
 
 namespace os
 {

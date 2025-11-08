@@ -14,6 +14,7 @@ FetchContent_Declare(
     spdlog
     GIT_REPOSITORY  https://github.com/gabime/spdlog.git
     GIT_TAG v1.15.3
+    CMAKE_ARGS     -DSPDLOG_FMT_EXTERNAL=ON
 )
 FetchContent_MakeAvailable(spdlog)
 
@@ -37,6 +38,14 @@ FetchContent_Declare(
     GIT_TAG v1.2.3
 )
 FetchContent_MakeAvailable(sigslot)
+
+FetchContent_Declare(
+    reflect_cpp
+    GIT_REPOSITORY  https://github.com/getml/reflect-cpp.git
+    GIT_TAG v0.22.0
+)
+FetchContent_MakeAvailable(reflect_cpp)
+
 
 if(NOT USING_IMGUI)
     set(USING_IMGUI on)
